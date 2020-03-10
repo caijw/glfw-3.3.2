@@ -40,10 +40,22 @@
 #include <unistd.h>
 #include <wayland-client.h>
 
+#include <stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#include <time.h>
 
 static inline int min(int n1, int n2)
 {
     return n1 < n2 ? n1 : n2;
+}
+
+static inline int timestamp()
+{
+    time_t t;
+    t = time(NULL);
+    int ii = time(&t);
+    return ii;
 }
 
 static _GLFWwindow* findWindowFromDecorationSurface(struct wl_surface* surface,
@@ -673,6 +685,76 @@ static const struct wl_keyboard_listener keyboardListener = {
 #endif
 };
 
+static void touchHandleDown(void *data,
+		                    struct wl_touch *wl_touch,
+		                    uint32_t serial,
+		                    uint32_t time,
+		                    struct wl_surface *surface,
+		                    int32_t id,
+		                    wl_fixed_t x,
+		                    wl_fixed_t y)
+{
+    printf("[c++][glfw][wl][touchHandleDown][%d]serial %d, time %d, id %d, x %d, y %d,\n", timestamp(), serial, time, id, x, y);
+}
+
+static void touchHandleUp(void *data,
+		                  struct wl_touch *wl_touch,
+		                  uint32_t serial,
+		                  uint32_t time,
+		                  int32_t id)
+{
+    printf("[c++][glfw][wl][touchHandleUp][%d]serial %d, time %d, id %d,\n", timestamp(), serial, time, id);
+}
+
+static void touchHandleMotion(void *data,
+		                      struct wl_touch *wl_touch,
+		                      uint32_t time,
+		                      int32_t id,
+		                      wl_fixed_t x,
+		                      wl_fixed_t y)
+{
+    printf("[c++][glfw][wl][touchHandleMotion][%d]time %d, id %d, x %d, y %d,\n", timestamp(), time, id, x, y);
+}
+
+static void touchHandleFrame(void *data,
+		                     struct wl_touch *wl_touch)
+{
+    printf("[c++][glfw][wl][touchHandleFrame][%d]\n", timestamp());
+}
+
+static void touchHandleCancel(void *data,
+		                      struct wl_touch *wl_touch)
+{
+    printf("[c++][glfw][wl][touchHandleCancel][%d]\n", timestamp());
+}
+
+static void touchHandleShape(void *data,
+		                     struct wl_touch *wl_touch,
+		                     int32_t id,
+		                     wl_fixed_t major,
+		                     wl_fixed_t minor)
+{
+    printf("[c++][glfw][wl][touchHandleShape][%d] id %d, major %d, minor %d,\n", timestamp(), id, major, minor);
+}
+
+static void touchHandleOrientation(void *data,
+			                       struct wl_touch *wl_touch,
+			                       int32_t id,
+			                       wl_fixed_t orientation)
+{
+    printf("[c++][glfw][wl][touchHandleOrientation][%d] id %d, orientation %d,\n", timestamp(), id, orientation);
+}
+
+static const struct wl_touch_listener touchListener = {
+    touchHandleDown,
+    touchHandleUp,
+    touchHandleMotion,
+    touchHandleFrame,
+    touchHandleCancel,
+    touchHandleShape,
+    touchHandleOrientation,
+};
+
 static void seatHandleCapabilities(void* data,
                                    struct wl_seat* seat,
                                    enum wl_seat_capability caps)
@@ -697,6 +779,16 @@ static void seatHandleCapabilities(void* data,
     {
         wl_keyboard_destroy(_glfw.wl.keyboard);
         _glfw.wl.keyboard = NULL;
+    }
+
+    if ( (caps & WL_SEAT_CAPABILITY_TOUCH) && !_glfw.wl.touch ) {
+        // 监听 touch
+        _glfw.wl.touch = wl_seat_get_touch(set);
+        wl_touch_add_listener(_glfw.wl.touch, &touchListenner, null);
+    } else if (!(caps & WL_SEAT_CAPABILITY_TOUCH) && _glfw.wl.touch) {
+        // 释放监听 touch
+        wl_touch_destroy(_glfw.wl.touch);
+        _glfw.wl.touch = NULL;
     }
 }
 
