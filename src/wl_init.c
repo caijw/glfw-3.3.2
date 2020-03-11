@@ -44,6 +44,7 @@
 #include<stdlib.h>
 #include<string.h>
 #include <time.h>
+#include <execinfo.h>
 
 static inline int min(int n1, int n2)
 {
@@ -57,6 +58,26 @@ static inline int timestamp()
     int ii = time(&t);
     return ii;
 }
+
+void print_callstack()
+{
+	int size = 32;
+	int i;
+	void *array[32];
+	int stack_num = backtrace(array, size);
+	char **stacktrace = NULL;
+ 
+	printf("[c++][wl][print_callstack]%s begin\n", __func__);
+	stacktrace = (char**)backtrace_symbols(array, stack_num);
+ 
+	for (i = 0; i < stack_num; i++)
+	{
+		printf("%s\n", stacktrace[i]);
+	}
+	free(stacktrace);
+	printf("[c++][wl][print_callstack]%s end\n", __func__);
+}
+
 
 static _GLFWwindow* findWindowFromDecorationSurface(struct wl_surface* surface,
                                                     int* which)
@@ -760,30 +781,31 @@ static void seatHandleCapabilities(void* data,
                                    struct wl_seat* seat,
                                    enum wl_seat_capability caps)
 {
-    printf("[c++][wl][seatHandleCapabilities][%d]caps %d,", timestamp(), caps);
+    print_callstack();
+    printf("[c++][wl][seatHandleCapabilities][%d]caps %d,\n", timestamp(), caps);
 
     if ((caps & WL_SEAT_CAPABILITY_POINTER) && !_glfw.wl.pointer)
     {
-        printf("[c++][wl][seatHandleCapabilities][%d]wl_pointer_add_listener", timestamp());
+        printf("[c++][wl][seatHandleCapabilities][%d]wl_pointer_add_listener\n", timestamp());
         _glfw.wl.pointer = wl_seat_get_pointer(seat);
         wl_pointer_add_listener(_glfw.wl.pointer, &pointerListener, NULL);
     }
     else if (!(caps & WL_SEAT_CAPABILITY_POINTER) && _glfw.wl.pointer)
     {
-        printf("[c++][wl][seatHandleCapabilities][%d]wl_pointer_destroy", timestamp());
+        printf("[c++][wl][seatHandleCapabilities][%d]wl_pointer_destroy\n", timestamp());
         wl_pointer_destroy(_glfw.wl.pointer);
         _glfw.wl.pointer = NULL;
     }
 
     if ((caps & WL_SEAT_CAPABILITY_KEYBOARD) && !_glfw.wl.keyboard)
     {
-        printf("[c++][wl][seatHandleCapabilities][%d]wl_keyboard_add_listener", timestamp());
+        printf("[c++][wl][seatHandleCapabilities][%d]wl_keyboard_add_listener\n", timestamp());
         _glfw.wl.keyboard = wl_seat_get_keyboard(seat);
         wl_keyboard_add_listener(_glfw.wl.keyboard, &keyboardListener, NULL);
     }
     else if (!(caps & WL_SEAT_CAPABILITY_KEYBOARD) && _glfw.wl.keyboard)
     {
-        printf("[c++][wl][seatHandleCapabilities][%d]wl_keyboard_destroy", timestamp());
+        printf("[c++][wl][seatHandleCapabilities][%d]wl_keyboard_destroy\n", timestamp());
 
         wl_keyboard_destroy(_glfw.wl.keyboard);
         _glfw.wl.keyboard = NULL;
@@ -791,12 +813,12 @@ static void seatHandleCapabilities(void* data,
 
     if ( (caps & WL_SEAT_CAPABILITY_TOUCH) && !_glfw.wl.touch ) {
         // 监听 touch
-        printf("[c++][wl][seatHandleCapabilities][%d]wl_touch_add_listener", timestamp());
+        printf("[c++][wl][seatHandleCapabilities][%d]wl_touch_add_listener\n", timestamp());
         _glfw.wl.touch = wl_seat_get_touch(seat);
         wl_touch_add_listener(_glfw.wl.touch, &touchListener, NULL);
     } else if (!(caps & WL_SEAT_CAPABILITY_TOUCH) && _glfw.wl.touch) {
         // 释放监听 touch
-        printf("[c++][wl][seatHandleCapabilities][%d]wl_touch_destroy", timestamp());
+        printf("[c++][wl][seatHandleCapabilities][%d]wl_touch_destroy\n", timestamp());
         wl_touch_destroy(_glfw.wl.touch);
         _glfw.wl.touch = NULL;
     }
