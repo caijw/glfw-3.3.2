@@ -784,8 +784,8 @@ static void seatHandleCapabilities(void* data,
 
     if ( (caps & WL_SEAT_CAPABILITY_TOUCH) && !_glfw.wl.touch ) {
         // 监听 touch
-        _glfw.wl.touch = wl_seat_get_touch(set);
-        wl_touch_add_listener(_glfw.wl.touch, &touchListenner, null);
+        _glfw.wl.touch = wl_seat_get_touch(seat);
+        wl_touch_add_listener(_glfw.wl.touch, &touchListener, null);
     } else if (!(caps & WL_SEAT_CAPABILITY_TOUCH) && _glfw.wl.touch) {
         // 释放监听 touch
         wl_touch_destroy(_glfw.wl.touch);
