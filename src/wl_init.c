@@ -251,6 +251,7 @@ static void pointerHandleButton(void* data,
                                 uint32_t button,
                                 uint32_t state)
 {
+    printf("[c++][glfw][wl][pointerHandleButton][%d]\n", timestamp());
     _GLFWwindow* window = _glfw.wl.pointerFocus;
     int glfwButton;
 
