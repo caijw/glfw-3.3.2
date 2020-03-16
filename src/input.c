@@ -27,6 +27,14 @@
 // Please use C89 style variable declarations in this file because VS 2010
 //========================================================================
 
+// 输入设备相关
+// 包括回调的注册:
+// 1. glfwSetKeyCallback 键盘的 key 回调注册
+// 2. glfwSetCharCallback 字符输入回调注册
+// 3. glfwSetMouseButtonCallback 鼠标按钮点击回调注册
+// 4. glfwSetScrollCallback 滚动回调注册
+// 5. 
+
 #include "internal.h"
 
 #include <assert.h>
@@ -316,7 +324,7 @@ void _glfwInputScroll(_GLFWwindow* window, double xoffset, double yoffset)
 }
 
 // Notifies shared code of a mouse button click event
-//
+// 鼠标点击事件通知注册的 mouseButton 回调
 void _glfwInputMouseClick(_GLFWwindow* window, int button, int action, int mods)
 {
     if (button < 0 || button > GLFW_MOUSE_BUTTON_LAST)
@@ -908,6 +916,12 @@ GLFWAPI GLFWdropfun glfwSetDropCallback(GLFWwindow* handle, GLFWdropfun cbfun)
     _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
     _GLFW_SWAP_POINTERS(window->callbacks.drop, cbfun);
     return cbfun;
+}
+// 注册 touch 回调
+// TODO
+GLFWAPI GLFWdropfun glfwSetTouchCallback(GLFWwindow* handle, GLFWdropfun cbfun)
+{
+
 }
 
 GLFWAPI int glfwJoystickPresent(int jid)

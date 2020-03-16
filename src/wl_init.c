@@ -113,6 +113,7 @@ static _GLFWwindow* findWindowFromDecorationSurface(struct wl_surface* surface,
     return window;
 }
 
+// pointer enter
 static void pointerHandleEnter(void* data,
                                struct wl_pointer* pointer,
                                uint32_t serial,
@@ -143,6 +144,7 @@ static void pointerHandleEnter(void* data,
     _glfwInputCursorEnter(window, GLFW_TRUE);
 }
 
+// pointer leave
 static void pointerHandleLeave(void* data,
                                struct wl_pointer* pointer,
                                uint32_t serial,
@@ -206,6 +208,7 @@ static void setCursor(_GLFWwindow* window, const char* name)
     _glfw.wl.cursorPreviousName = name;
 }
 
+// pointer motion
 static void pointerHandleMotion(void* data,
                                 struct wl_pointer* pointer,
                                 uint32_t time,
@@ -265,6 +268,7 @@ static void pointerHandleMotion(void* data,
         setCursor(window, cursorName);
 }
 
+// button
 static void pointerHandleButton(void* data,
                                 struct wl_pointer* pointer,
                                 uint32_t serial,
@@ -272,7 +276,6 @@ static void pointerHandleButton(void* data,
                                 uint32_t button,
                                 uint32_t state)
 {
-    printf("[c++][glfw][wl][pointerHandleButton][%d]\n", timestamp());
     _GLFWwindow* window = _glfw.wl.pointerFocus;
     int glfwButton;
 
@@ -281,6 +284,7 @@ static void pointerHandleButton(void* data,
 
     if (!window)
         return;
+    // left button
     if (button == BTN_LEFT)
     {
         switch (window->wl.decorations.focus)
@@ -331,6 +335,7 @@ static void pointerHandleButton(void* data,
                                         serial, edges);
         }
     }
+    // right button
     else if (button == BTN_RIGHT)
     {
         if (window->wl.decorations.focus != mainWindow && window->wl.xdg.toplevel)
@@ -361,6 +366,7 @@ static void pointerHandleButton(void* data,
                          _glfw.wl.xkb.modifiers);
 }
 
+// axis
 static void pointerHandleAxis(void* data,
                               struct wl_pointer* pointer,
                               uint32_t time,
@@ -389,13 +395,14 @@ static void pointerHandleAxis(void* data,
 }
 
 static const struct wl_pointer_listener pointerListener = {
-    pointerHandleEnter,
-    pointerHandleLeave,
-    pointerHandleMotion,
-    pointerHandleButton,
-    pointerHandleAxis,
+    pointerHandleEnter, // pointer enter
+    pointerHandleLeave, // pointer leave
+    pointerHandleMotion, // pointer motion
+    pointerHandleButton, // button
+    pointerHandleAxis, // axis
 };
 
+// TODO
 static void keyboardHandleKeymap(void* data,
                                  struct wl_keyboard* keyboard,
                                  uint32_t format,
@@ -498,6 +505,7 @@ static void keyboardHandleKeymap(void* data,
         1 << xkb_keymap_mod_get_index(_glfw.wl.xkb.keymap, "Mod2");
 }
 
+// keyboard enter
 static void keyboardHandleEnter(void* data,
                                 struct wl_keyboard* keyboard,
                                 uint32_t serial,
@@ -521,6 +529,7 @@ static void keyboardHandleEnter(void* data,
     _glfwInputWindowFocus(window, GLFW_TRUE);
 }
 
+// keyboard leave
 static void keyboardHandleLeave(void* data,
                                 struct wl_keyboard* keyboard,
                                 uint32_t serial,
@@ -707,6 +716,7 @@ static const struct wl_keyboard_listener keyboardListener = {
 #endif
 };
 
+// touch down
 static void touchHandleDown(void *data,
 		                    struct wl_touch *wl_touch,
 		                    uint32_t serial,
@@ -717,6 +727,24 @@ static void touchHandleDown(void *data,
 		                    wl_fixed_t y)
 {
     printf("[c++][glfw][wl][touchHandleDown][%d]serial %d, time %d, id %d, x %d, y %d,\n", timestamp(), serial, time, id, x, y);
+    // Happens in the case we just destroyed the surface.
+    if (!surface)
+        return;
+
+    _GLFWwindow* window = wl_surface_get_user_data(surface);
+    if (!window)
+    {
+        window = findWindowFromDecorationSurface(surface, NULL);
+        if (!window)
+            return;
+    }
+    _glfw.wl.serial = serial;
+    _glfw.wl.pointerFocus = window;
+
+    window->wl.hovered = GLFW_TRUE;
+
+    _glfwPlatformSetCursor(window, window->wl.currentCursor);
+    _glfwInputCursorEnter(window, GLFW_TRUE);
 }
 
 static void touchHandleUp(void *data,
@@ -784,6 +812,7 @@ static void seatHandleCapabilities(void* data,
     print_callstack();
     printf("[c++][wl][seatHandleCapabilities][%d]caps %d,\n", timestamp(), caps);
 
+    // pointer
     if ((caps & WL_SEAT_CAPABILITY_POINTER) && !_glfw.wl.pointer)
     {
         printf("[c++][wl][seatHandleCapabilities][%d]wl_pointer_add_listener\n", timestamp());
@@ -797,6 +826,7 @@ static void seatHandleCapabilities(void* data,
         _glfw.wl.pointer = NULL;
     }
 
+    // keyboard
     if ((caps & WL_SEAT_CAPABILITY_KEYBOARD) && !_glfw.wl.keyboard)
     {
         printf("[c++][wl][seatHandleCapabilities][%d]wl_keyboard_add_listener\n", timestamp());
@@ -811,6 +841,7 @@ static void seatHandleCapabilities(void* data,
         _glfw.wl.keyboard = NULL;
     }
 
+    // touch
     if ( (caps & WL_SEAT_CAPABILITY_TOUCH) && !_glfw.wl.touch ) {
         // 监听 touch
         printf("[c++][wl][seatHandleCapabilities][%d]wl_touch_add_listener\n", timestamp());
