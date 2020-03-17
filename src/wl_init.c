@@ -67,7 +67,7 @@ void print_callstack()
 	int stack_num = backtrace(array, size);
 	char **stacktrace = NULL;
  
-	printf("[c++][wl][print_callstack]%s begin\n", __func__);
+	printf("[c++][glfw][print_callstack]%s begin\n", __func__);
 	stacktrace = (char**)backtrace_symbols(array, stack_num);
  
 	for (i = 0; i < stack_num; i++)
@@ -75,7 +75,7 @@ void print_callstack()
 		printf("%s\n", stacktrace[i]);
 	}
 	free(stacktrace);
-	printf("[c++][wl][print_callstack]%s end\n", __func__);
+	printf("[c++][glfw][print_callstack]%s end\n", __func__);
 }
 
 
@@ -725,7 +725,7 @@ static void touchHandleDown(void *data,
 		                    wl_fixed_t x,
 		                    wl_fixed_t y)
 {
-    printf("[c++][glfw][wl][touchHandleDown][%d]serial %d, time %d, id %d, x %d, y %d,\n", timestamp(), serial, time, id, x, y);
+    printf("[c++][glfw][glfw][touchHandleDown][%d]serial %d, time %d, id %d, x %d, y %d,\n", timestamp(), serial, time, id, x, y);
 
     // Happens in the case we just destroyed the surface.
     if (!surface)
@@ -757,7 +757,7 @@ static void touchHandleUp(void *data,
 		                  uint32_t time,
 		                  int32_t id)
 {
-    printf("[c++][glfw][wl][touchHandleUp][%d]serial %d, time %d, id %d,\n", timestamp(), serial, time, id);
+    printf("[c++][glfw][glfw][touchHandleUp][%d]serial %d, time %d, id %d,\n", timestamp(), serial, time, id);
     _GLFWwindow* window = _glfw.wl.pointerFocus;
 
     if (!window)
@@ -778,7 +778,7 @@ static void touchHandleMotion(void *data,
 		                      wl_fixed_t sx,
 		                      wl_fixed_t sy)
 {
-    printf("[c++][glfw][wl][touchHandleMotion][%d]time %d, id %d, x %d, y %d,\n", timestamp(), time, id, sx, sy);
+    printf("[c++][glfw][glfw][touchHandleMotion][%d]time %d, id %d, x %d, y %d,\n", timestamp(), time, id, sx, sy);
    _GLFWwindow* window = _glfw.wl.pointerFocus;
     const char* cursorName = NULL;
     double x, y;
@@ -835,13 +835,13 @@ static void touchHandleMotion(void *data,
 static void touchHandleFrame(void *data,
 		                     struct wl_touch *wl_touch)
 {
-    printf("[c++][glfw][wl][touchHandleFrame][%d]\n", timestamp());
+    printf("[c++][glfw][glfw][touchHandleFrame][%d]\n", timestamp());
 }
 
 static void touchHandleCancel(void *data,
 		                      struct wl_touch *wl_touch)
 {
-    printf("[c++][glfw][wl][touchHandleCancel][%d]\n", timestamp());
+    printf("[c++][glfw][glfw][touchHandleCancel][%d]\n", timestamp());
 }
 
 static void touchHandleShape(void *data,
@@ -850,7 +850,7 @@ static void touchHandleShape(void *data,
 		                     wl_fixed_t major,
 		                     wl_fixed_t minor)
 {
-    printf("[c++][glfw][wl][touchHandleShape][%d] id %d, major %d, minor %d,\n", timestamp(), id, major, minor);
+    printf("[c++][glfw][glfw][touchHandleShape][%d] id %d, major %d, minor %d,\n", timestamp(), id, major, minor);
 }
 
 static void touchHandleOrientation(void *data,
@@ -858,7 +858,7 @@ static void touchHandleOrientation(void *data,
 			                       int32_t id,
 			                       wl_fixed_t orientation)
 {
-    printf("[c++][glfw][wl][touchHandleOrientation][%d] id %d, orientation %d,\n", timestamp(), id, orientation);
+    printf("[c++][glfw][glfw][touchHandleOrientation][%d] id %d, orientation %d,\n", timestamp(), id, orientation);
 }
 
 static const struct wl_touch_listener touchListener = {
@@ -876,18 +876,18 @@ static void seatHandleCapabilities(void* data,
                                    enum wl_seat_capability caps)
 {
     print_callstack();
-    printf("[c++][wl][seatHandleCapabilities][%d]caps %d,\n", timestamp(), caps);
+    printf("[c++][glfw][seatHandleCapabilities][%d]caps %d,\n", timestamp(), caps);
 
     // pointer
     if ((caps & WL_SEAT_CAPABILITY_POINTER) && !_glfw.wl.pointer)
     {
-        printf("[c++][wl][seatHandleCapabilities][%d]wl_pointer_add_listener\n", timestamp());
+        printf("[c++][glfw][seatHandleCapabilities][%d]wl_pointer_add_listener\n", timestamp());
         _glfw.wl.pointer = wl_seat_get_pointer(seat);
         wl_pointer_add_listener(_glfw.wl.pointer, &pointerListener, NULL);
     }
     else if (!(caps & WL_SEAT_CAPABILITY_POINTER) && _glfw.wl.pointer)
     {
-        printf("[c++][wl][seatHandleCapabilities][%d]wl_pointer_destroy\n", timestamp());
+        printf("[c++][glfw][seatHandleCapabilities][%d]wl_pointer_destroy\n", timestamp());
         wl_pointer_destroy(_glfw.wl.pointer);
         _glfw.wl.pointer = NULL;
     }
@@ -895,13 +895,13 @@ static void seatHandleCapabilities(void* data,
     // keyboard
     if ((caps & WL_SEAT_CAPABILITY_KEYBOARD) && !_glfw.wl.keyboard)
     {
-        printf("[c++][wl][seatHandleCapabilities][%d]wl_keyboard_add_listener\n", timestamp());
+        printf("[c++][glfw][seatHandleCapabilities][%d]wl_keyboard_add_listener\n", timestamp());
         _glfw.wl.keyboard = wl_seat_get_keyboard(seat);
         wl_keyboard_add_listener(_glfw.wl.keyboard, &keyboardListener, NULL);
     }
     else if (!(caps & WL_SEAT_CAPABILITY_KEYBOARD) && _glfw.wl.keyboard)
     {
-        printf("[c++][wl][seatHandleCapabilities][%d]wl_keyboard_destroy\n", timestamp());
+        printf("[c++][glfw][seatHandleCapabilities][%d]wl_keyboard_destroy\n", timestamp());
 
         wl_keyboard_destroy(_glfw.wl.keyboard);
         _glfw.wl.keyboard = NULL;
@@ -910,12 +910,12 @@ static void seatHandleCapabilities(void* data,
     // touch
     if ( (caps & WL_SEAT_CAPABILITY_TOUCH) && !_glfw.wl.touch ) {
         // 监听 touch
-        printf("[c++][wl][seatHandleCapabilities][%d]wl_touch_add_listener\n", timestamp());
+        printf("[c++][glfw][seatHandleCapabilities][%d]wl_touch_add_listener\n", timestamp());
         _glfw.wl.touch = wl_seat_get_touch(seat);
         wl_touch_add_listener(_glfw.wl.touch, &touchListener, NULL);
     } else if (!(caps & WL_SEAT_CAPABILITY_TOUCH) && _glfw.wl.touch) {
         // 释放监听 touch
-        printf("[c++][wl][seatHandleCapabilities][%d]wl_touch_destroy\n", timestamp());
+        printf("[c++][glfw][seatHandleCapabilities][%d]wl_touch_destroy\n", timestamp());
         wl_touch_destroy(_glfw.wl.touch);
         _glfw.wl.touch = NULL;
     }
