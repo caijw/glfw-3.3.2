@@ -209,6 +209,16 @@ static void setCursor(_GLFWwindow* window, const char* name)
     _glfw.wl.cursorPreviousName = name;
 }
 
+static void addTouch(_GLFWwindow* window,
+                    struct wl_touch *wl_touch,
+                    uint32_t time,
+                    int32_t id,
+                    wl_fixed_t x,
+                    wl_fixed_t y)
+{
+    
+}
+
 // pointer motion
 static void pointerHandleMotion(void* data,
                                 struct wl_pointer* pointer,
@@ -750,16 +760,6 @@ static void touchHandleDown(void *data,
     _glfw.wl.touchFocus = window;
 
     addTouch(window, wl_touch, time, id, x, y); 
-}
-
-static void addTouch(_GLFWwindow* window,
-                    struct wl_touch *wl_touch,
-                    uint32_t time,
-                    int32_t id,
-                    wl_fixed_t x,
-                    wl_fixed_t y)
-{
-    
 }
 
 static void updateTouch(_GLFWwindow* window,
