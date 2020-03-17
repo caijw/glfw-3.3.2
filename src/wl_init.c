@@ -354,7 +354,7 @@ static void pointerHandleButton(void* data,
     // Don’t pass the button to the user if it was related to a decoration.
     // TODO decorations 是什么
     if (window->wl.decorations.focus != mainWindow){
-        printf("[c++][glfw][pointerHandleButton]window->wl.decorations.focus != mainWindow")
+        printf("[c++][glfw][pointerHandleButton]window->wl.decorations.focus != mainWindow\n");
         return;
     }
         
