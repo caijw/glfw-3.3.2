@@ -209,14 +209,46 @@ static void setCursor(_GLFWwindow* window, const char* name)
     _glfw.wl.cursorPreviousName = name;
 }
 
-static void addTouch(_GLFWwindow* window,
+// add wrapped touch to glfw window object
+static bool addTouch(_GLFWwindow* window,
+                    struct wl_touch *wl_touch,
+                    uint32_t time,
+                    int32_t id,
+                    wl_fixed_t sx,
+                    wl_fixed_t sy)
+{
+    double x = wl_fixed_to_double(sx);
+    double y = wl_fixed_to_double(sy);
+    GLFWtouch* touch = glfwCreateTouch(window, id, x, y);
+    if (touch) {
+        // add to link
+        touch->next = window->wl.touches;
+        window->touches = touch;
+        return true;
+    } else {
+        return false;
+    }
+}
+// update wrapped touch on glfw window object
+static bool updateTouch(_GLFWwindow* window,
                     struct wl_touch *wl_touch,
                     uint32_t time,
                     int32_t id,
                     wl_fixed_t x,
                     wl_fixed_t y)
 {
-    
+    return true;
+}
+
+// remove wrapped touch on glfw window object
+static bool removeTouch(_GLFWwindow* window,
+                    struct wl_touch *wl_touch,
+                    uint32_t time,
+                    int32_t id,
+                    wl_fixed_t x,
+                    wl_fixed_t y)
+{
+    return true;
 }
 
 // pointer motion
@@ -362,9 +394,10 @@ static void pointerHandleButton(void* data,
     }
 
     // Don’t pass the button to the user if it was related to a decoration.
-    // TODO decorations 是什么
+    // TODO decorations
     if (window->wl.decorations.focus != mainWindow){
-        printf("[c++][glfw][pointerHandleButton]window->wl.decorations.focus != mainWindow\n");
+        // 根据实际测试，点击顶部的 bar 会进入这个逻辑
+        // 即点击的不是flutter窗口渲染的内容
         return;
     }
         
@@ -739,40 +772,35 @@ static void touchHandleDown(void *data,
 		                    uint32_t time,
 		                    struct wl_surface *surface,
 		                    int32_t id,
-		                    wl_fixed_t x,
-		                    wl_fixed_t y)
+		                    wl_fixed_t sx,
+		                    wl_fixed_t sy)
 {
-    printf("[c++][glfw][touchHandleDown][%d]serial %d, time %d, id %d, x %d, y %d,\n", timestamp(), serial, time, id, x, y);
-
+    printf("[c++][glfw][touchHandleDown][%d]serial %d, time %d, id %d, sx %d, sy %d,\n", timestamp(), serial, time, id, sx, sy);
     // Happens in the case we just destroyed the surface.
     if (!surface)
         return;
 
-    int focus = 0;
     _GLFWwindow* window = wl_surface_get_user_data(surface);
     if (!window)
     {
-        window = findWindowFromDecorationSurface(surface, &focus);
+        window = findWindowFromDecorationSurface(surface, NULL);
         if (!window)
             return;
     }
+
     _glfw.wl.serial = serial;
     _glfw.wl.touchFocus = window;
 
-    addTouch(window, wl_touch, time, id, x, y); 
-}
+    bool hasAddTouch = addTouch(window, wl_touch, time, id, sx, sy); // 增加 touch
+    if (!hasAddTouch) {
+        return;
+    }
 
-static void updateTouch(_GLFWwindow* window,
-                    struct wl_touch *wl_touch,
-                    uint32_t time,
-                    int32_t id,
-                    wl_fixed_t x,
-                    wl_fixed_t y)
-{
 
 }
 
-
+// wayland 没有给 touch up 的坐标信息
+// 还得把最后一次的坐标（down/motion）缓存起来，在这里给 flutter
 static void touchHandleUp(void *data,
 		                  struct wl_touch *wl_touch,
 		                  uint32_t serial,
@@ -780,7 +808,7 @@ static void touchHandleUp(void *data,
 		                  int32_t id)
 {
     printf("[c++][glfw][touchHandleUp][%d]serial %d, time %d, id %d,\n", timestamp(), serial, time, id);
-    _GLFWwindow* window = _glfw.wl.pointerFocus;
+    _GLFWwindow* window = _glfw.wl.touchFocus;
 
     if (!window)
         return;
@@ -801,57 +829,15 @@ static void touchHandleMotion(void *data,
 		                      wl_fixed_t sy)
 {
     printf("[c++][glfw][touchHandleMotion][%d]time %d, id %d, x %d, y %d,\n", timestamp(), time, id, sx, sy);
-   _GLFWwindow* window = _glfw.wl.pointerFocus;
-    const char* cursorName = NULL;
+    _GLFWwindow* window = _glfw.wl.touchFocus;
     double x, y;
-
     if (!window)
         return;
-
-    if (window->cursorMode == GLFW_CURSOR_DISABLED)
+    bool hasUpdateTouch = updateTouch(window, wl_touch, time, id, sx, sy); 
+    if (!hasUpdateTouch) {
         return;
-    x = wl_fixed_to_double(sx);
-    y = wl_fixed_to_double(sy);
-
-    switch (window->wl.decorations.focus)
-    {
-        case mainWindow:
-            window->wl.cursorPosX = x;
-            window->wl.cursorPosY = y;
-            _glfwInputCursorPos(window, x, y);
-            _glfw.wl.cursorPreviousName = NULL;
-            return;
-        case topDecoration:
-            if (y < _GLFW_DECORATION_WIDTH)
-                cursorName = "n-resize";
-            else
-                cursorName = "left_ptr";
-            break;
-        case leftDecoration:
-            if (y < _GLFW_DECORATION_WIDTH)
-                cursorName = "nw-resize";
-            else
-                cursorName = "w-resize";
-            break;
-        case rightDecoration:
-            if (y < _GLFW_DECORATION_WIDTH)
-                cursorName = "ne-resize";
-            else
-                cursorName = "e-resize";
-            break;
-        case bottomDecoration:
-            if (x < _GLFW_DECORATION_WIDTH)
-                cursorName = "sw-resize";
-            else if (x > window->wl.width + _GLFW_DECORATION_WIDTH)
-                cursorName = "se-resize";
-            else
-                cursorName = "s-resize";
-            break;
-        default:
-            assert(0);
     }
-    if (_glfw.wl.cursorPreviousName != cursorName)
-        setCursor(window, cursorName);
+
 }
 
 static void touchHandleFrame(void *data,

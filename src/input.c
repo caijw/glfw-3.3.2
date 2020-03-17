@@ -834,6 +834,47 @@ GLFWAPI void glfwSetCursor(GLFWwindow* windowHandle, GLFWcursor* cursorHandle)
     _glfwPlatformSetCursor(window, cursor);
 }
 
+GLFWAPI GLFWtouch* glfwCreateTouch(_GLFWwindow* window, int32_t id, double x, double y)
+{
+    _GLFWtouch* touch;
+
+    _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
+
+    touch = calloc(1, sizeof(_GLFWtouch));
+    if (!touch) {
+        // TODO throw error
+    }
+    return (GLFWtouch*) touch;
+}
+// TODO find out when to release the touch created before
+GLFWAPI void glfwDestroyTouch(GLFWtouch* handle)
+{
+    _GLFWtouch* touch = (_GLFWtouch*) handle;
+
+    _GLFW_REQUIRE_INIT();
+
+    if (touch == NULL)
+        return;
+
+    // Make sure the touch is not being used by any window
+    {
+        _GLFWwindow* window;
+
+        for (window = _glfw.windowListHead;  window;  window = window->next)
+        {
+            // TODO 在 window 的 touches 链表里面找，如果不存在即可 destroy
+        }
+    }
+
+    // Unlink touch from global linked list
+    {
+        // TODO 参考 pointer 是不是要把 touch 也挂到 global 的 link
+        // 如果是的话，这里需要把 global 的 link 里面的 touch 去掉
+    }
+
+    free(touch);
+}
+
 GLFWAPI GLFWkeyfun glfwSetKeyCallback(GLFWwindow* handle, GLFWkeyfun cbfun)
 {
     _GLFWwindow* window = (_GLFWwindow*) handle;

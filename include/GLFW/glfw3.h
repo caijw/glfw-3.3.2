@@ -1168,6 +1168,18 @@ typedef struct GLFWwindow GLFWwindow;
  */
 typedef struct GLFWcursor GLFWcursor;
 
+/*! @brief Opaque touch object.
+ *
+ *  Opaque touch object.
+ *
+ *  @see @ref touch_object
+ *
+ *  @since Added in version x.x.
+ *
+ *  @ingroup input
+ */
+typedef struct GLFWtouch GLFWtouch;
+
 /*! @brief The function pointer type for error callbacks.
  *
  *  This is the function pointer type for error callbacks.  An error callback
