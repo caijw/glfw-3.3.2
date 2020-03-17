@@ -778,7 +778,7 @@ static void touchHandleMotion(void *data,
 		                      wl_fixed_t sx,
 		                      wl_fixed_t sy)
 {
-    printf("[c++][glfw][wl][touchHandleMotion][%d]time %d, id %d, x %d, y %d,\n", timestamp(), time, id, x, y);
+    printf("[c++][glfw][wl][touchHandleMotion][%d]time %d, id %d, x %d, y %d,\n", timestamp(), time, id, sx, sy);
    _GLFWwindow* window = _glfw.wl.pointerFocus;
     const char* cursorName = NULL;
     double x, y;
