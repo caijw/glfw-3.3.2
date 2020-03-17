@@ -121,7 +121,7 @@ static void pointerHandleEnter(void* data,
                                wl_fixed_t sx,
                                wl_fixed_t sy)
 {
-    printf("[c++][glfw][pointerHandleEnter][%d]serial %d, id %d, sx %d, sy %d,\n", timestamp(), serial, sx, sy);
+    printf("[c++][glfw][pointerHandleEnter][%d]serial %d, sx %d, sy %d,\n", timestamp(), serial, sx, sy);
     // Happens in the case we just destroyed the surface.
     if (!surface)
         return;
