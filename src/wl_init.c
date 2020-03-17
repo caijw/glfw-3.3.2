@@ -121,6 +121,7 @@ static void pointerHandleEnter(void* data,
                                wl_fixed_t sx,
                                wl_fixed_t sy)
 {
+    printf("[c++][glfw][pointerHandleEnter][%d]serial %d, id %d, sx %d, sy %d,\n", timestamp(), serial, sx, sy);
     // Happens in the case we just destroyed the surface.
     if (!surface)
         return;
@@ -725,7 +726,7 @@ static void touchHandleDown(void *data,
 		                    wl_fixed_t x,
 		                    wl_fixed_t y)
 {
-    printf("[c++][glfw][glfw][touchHandleDown][%d]serial %d, time %d, id %d, x %d, y %d,\n", timestamp(), serial, time, id, x, y);
+    printf("[c++][glfw][touchHandleDown][%d]serial %d, time %d, id %d, x %d, y %d,\n", timestamp(), serial, time, id, x, y);
 
     // Happens in the case we just destroyed the surface.
     if (!surface)
@@ -757,7 +758,7 @@ static void touchHandleUp(void *data,
 		                  uint32_t time,
 		                  int32_t id)
 {
-    printf("[c++][glfw][glfw][touchHandleUp][%d]serial %d, time %d, id %d,\n", timestamp(), serial, time, id);
+    printf("[c++][glfw][touchHandleUp][%d]serial %d, time %d, id %d,\n", timestamp(), serial, time, id);
     _GLFWwindow* window = _glfw.wl.pointerFocus;
 
     if (!window)
@@ -778,7 +779,7 @@ static void touchHandleMotion(void *data,
 		                      wl_fixed_t sx,
 		                      wl_fixed_t sy)
 {
-    printf("[c++][glfw][glfw][touchHandleMotion][%d]time %d, id %d, x %d, y %d,\n", timestamp(), time, id, sx, sy);
+    printf("[c++][glfw][touchHandleMotion][%d]time %d, id %d, x %d, y %d,\n", timestamp(), time, id, sx, sy);
    _GLFWwindow* window = _glfw.wl.pointerFocus;
     const char* cursorName = NULL;
     double x, y;
@@ -835,13 +836,13 @@ static void touchHandleMotion(void *data,
 static void touchHandleFrame(void *data,
 		                     struct wl_touch *wl_touch)
 {
-    printf("[c++][glfw][glfw][touchHandleFrame][%d]\n", timestamp());
+    printf("[c++][glfw][touchHandleFrame][%d]\n", timestamp());
 }
 
 static void touchHandleCancel(void *data,
 		                      struct wl_touch *wl_touch)
 {
-    printf("[c++][glfw][glfw][touchHandleCancel][%d]\n", timestamp());
+    printf("[c++][glfw][touchHandleCancel][%d]\n", timestamp());
 }
 
 static void touchHandleShape(void *data,
@@ -850,7 +851,7 @@ static void touchHandleShape(void *data,
 		                     wl_fixed_t major,
 		                     wl_fixed_t minor)
 {
-    printf("[c++][glfw][glfw][touchHandleShape][%d] id %d, major %d, minor %d,\n", timestamp(), id, major, minor);
+    printf("[c++][glfw][touchHandleShape][%d] id %d, major %d, minor %d,\n", timestamp(), id, major, minor);
 }
 
 static void touchHandleOrientation(void *data,
@@ -858,7 +859,7 @@ static void touchHandleOrientation(void *data,
 			                       int32_t id,
 			                       wl_fixed_t orientation)
 {
-    printf("[c++][glfw][glfw][touchHandleOrientation][%d] id %d, orientation %d,\n", timestamp(), id, orientation);
+    printf("[c++][glfw][touchHandleOrientation][%d] id %d, orientation %d,\n", timestamp(), id, orientation);
 }
 
 static const struct wl_touch_listener touchListener = {
