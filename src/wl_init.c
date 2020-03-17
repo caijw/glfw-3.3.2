@@ -726,17 +726,21 @@ static void touchHandleDown(void *data,
 		                    wl_fixed_t y)
 {
     printf("[c++][glfw][wl][touchHandleDown][%d]serial %d, time %d, id %d, x %d, y %d,\n", timestamp(), serial, time, id, x, y);
+
     // Happens in the case we just destroyed the surface.
     if (!surface)
         return;
 
+    int focus = 0;
     _GLFWwindow* window = wl_surface_get_user_data(surface);
     if (!window)
     {
-        window = findWindowFromDecorationSurface(surface, NULL);
+        window = findWindowFromDecorationSurface(surface, &focus);
         if (!window)
             return;
     }
+
+    window->wl.decorations.focus = focus;
     _glfw.wl.serial = serial;
     _glfw.wl.pointerFocus = window;
 
@@ -744,6 +748,7 @@ static void touchHandleDown(void *data,
 
     _glfwPlatformSetCursor(window, window->wl.currentCursor);
     _glfwInputCursorEnter(window, GLFW_TRUE);
+
 }
 
 static void touchHandleUp(void *data,
@@ -753,6 +758,17 @@ static void touchHandleUp(void *data,
 		                  int32_t id)
 {
     printf("[c++][glfw][wl][touchHandleUp][%d]serial %d, time %d, id %d,\n", timestamp(), serial, time, id);
+    _GLFWwindow* window = _glfw.wl.pointerFocus;
+
+    if (!window)
+        return;
+
+    window->wl.hovered = GLFW_FALSE;
+
+    _glfw.wl.serial = serial;
+    _glfw.wl.pointerFocus = NULL;
+    _glfwInputCursorEnter(window, GLFW_FALSE);
+    _glfw.wl.cursorPreviousName = NULL;
 }
 
 static void touchHandleMotion(void *data,
@@ -763,6 +779,57 @@ static void touchHandleMotion(void *data,
 		                      wl_fixed_t y)
 {
     printf("[c++][glfw][wl][touchHandleMotion][%d]time %d, id %d, x %d, y %d,\n", timestamp(), time, id, x, y);
+   _GLFWwindow* window = _glfw.wl.pointerFocus;
+    const char* cursorName = NULL;
+    double x, y;
+
+    if (!window)
+        return;
+
+    if (window->cursorMode == GLFW_CURSOR_DISABLED)
+        return;
+    x = wl_fixed_to_double(sx);
+    y = wl_fixed_to_double(sy);
+
+    switch (window->wl.decorations.focus)
+    {
+        case mainWindow:
+            window->wl.cursorPosX = x;
+            window->wl.cursorPosY = y;
+            _glfwInputCursorPos(window, x, y);
+            _glfw.wl.cursorPreviousName = NULL;
+            return;
+        case topDecoration:
+            if (y < _GLFW_DECORATION_WIDTH)
+                cursorName = "n-resize";
+            else
+                cursorName = "left_ptr";
+            break;
+        case leftDecoration:
+            if (y < _GLFW_DECORATION_WIDTH)
+                cursorName = "nw-resize";
+            else
+                cursorName = "w-resize";
+            break;
+        case rightDecoration:
+            if (y < _GLFW_DECORATION_WIDTH)
+                cursorName = "ne-resize";
+            else
+                cursorName = "e-resize";
+            break;
+        case bottomDecoration:
+            if (x < _GLFW_DECORATION_WIDTH)
+                cursorName = "sw-resize";
+            else if (x > window->wl.width + _GLFW_DECORATION_WIDTH)
+                cursorName = "se-resize";
+            else
+                cursorName = "s-resize";
+            break;
+        default:
+            assert(0);
+    }
+    if (_glfw.wl.cursorPreviousName != cursorName)
+        setCursor(window, cursorName);
 }
 
 static void touchHandleFrame(void *data,
