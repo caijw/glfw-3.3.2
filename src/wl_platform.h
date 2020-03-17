@@ -74,7 +74,7 @@ typedef VkBool32 (APIENTRY *PFN_vkGetPhysicalDeviceWaylandPresentationSupportKHR
 #define _GLFW_PLATFORM_LIBRARY_WINDOW_STATE _GLFWlibraryWayland wl
 #define _GLFW_PLATFORM_MONITOR_STATE        _GLFWmonitorWayland wl
 #define _GLFW_PLATFORM_CURSOR_STATE         _GLFWcursorWayland  wl
-#define _GLFW_PLATFORM_TOUCH_STATE          _GLFWTouchWayland   wl
+#define _GLFW_PLATFORM_TOUCH_STATE          _GLFWtouchWayland   wl
 
 #define _GLFW_PLATFORM_CONTEXT_STATE         struct { int dummyContext; }
 #define _GLFW_PLATFORM_LIBRARY_CONTEXT_STATE struct { int dummyLibraryContext; }
