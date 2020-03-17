@@ -1571,6 +1571,33 @@ typedef void (* GLFWcharmodsfun)(GLFWwindow*,unsigned int,int);
  */
 typedef void (* GLFWdropfun)(GLFWwindow*,int,const char*[]);
 
+/*! @brief The function pointer type for touch callbacks.
+ *
+ *  This is the function pointer type for touch callbacks.  A touch
+ *  callback function has the following signature:
+ *  @code
+ *  void function_name(GLFWwindow* window, int button, int action, int mods)
+ *  @endcode
+ *
+ *  @param[in] window The window that received the event.
+ *  @param[in] button The [mouse button](@ref buttons) that was pressed or
+ *  released.
+ *  @param[in] action One of `GLFW_PRESS` or `GLFW_RELEASE`.  Future releases
+ *  may add more actions.
+ *  @param[in] mods Bit field describing which [modifier keys](@ref mods) were
+ *  held down.
+ *
+ *  @sa @ref input_mouse_button
+ *  @sa @ref glfwSetMouseButtonCallback
+ *
+ *  @since Added in version x.x.
+ *  @glfw3 Added window handle and modifier mask parameters.
+ *
+ *  @ingroup input
+ */
+// touch 事件回调函数签名
+typedef void (* GLFWtouchfun)(GLFWwindow*,int,int,int);
+
 /*! @brief The function pointer type for monitor configuration callbacks.
  *
  *  This is the function pointer type for monitor configuration callbacks.

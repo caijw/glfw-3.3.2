@@ -919,9 +919,14 @@ GLFWAPI GLFWdropfun glfwSetDropCallback(GLFWwindow* handle, GLFWdropfun cbfun)
 }
 // 注册 touch 回调
 // TODO
-GLFWAPI GLFWdropfun glfwSetTouchCallback(GLFWwindow* handle, GLFWdropfun cbfun)
+GLFWAPI GLFWtouchfun glfwSetTouchCallback(GLFWwindow* handle, GLFWtouchfun cbfun)
 {
+    _GLFWwindow* window = (_GLFWwindow*) handle;
+    assert(window != NULL);
 
+    _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
+    _GLFW_SWAP_POINTERS(window->callbacks.touch, cbfun);
+    return cbfun;
 }
 
 GLFWAPI int glfwJoystickPresent(int jid)

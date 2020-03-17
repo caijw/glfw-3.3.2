@@ -402,7 +402,6 @@ static const struct wl_pointer_listener pointerListener = {
     pointerHandleAxis, // axis
 };
 
-// TODO
 static void keyboardHandleKeymap(void* data,
                                  struct wl_keyboard* keyboard,
                                  uint32_t format,

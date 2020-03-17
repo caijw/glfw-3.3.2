@@ -413,6 +413,7 @@ struct _GLFWwindow
         GLFWcharfun             character;
         GLFWcharmodsfun         charmods;
         GLFWdropfun             drop;
+        GLFWtouchfun            touch;
     } callbacks;
 
     // This is defined in the window API's platform.h
