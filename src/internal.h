@@ -70,6 +70,7 @@ typedef struct _GLFWwindow      _GLFWwindow;
 typedef struct _GLFWlibrary     _GLFWlibrary;
 typedef struct _GLFWmonitor     _GLFWmonitor;
 typedef struct _GLFWcursor      _GLFWcursor;
+typedef struct _GLFWtouch       _GLFWtouch;
 typedef struct _GLFWmapelement  _GLFWmapelement;
 typedef struct _GLFWmapping     _GLFWmapping;
 typedef struct _GLFWjoystick    _GLFWjoystick;
@@ -452,6 +453,16 @@ struct _GLFWcursor
 
     // This is defined in the window API's platform.h
     _GLFW_PLATFORM_CURSOR_STATE;
+};
+
+// Cursor structure
+//
+struct _GLFWtouch
+{
+    _GLFWtouch*    next;
+
+    // This is defined in the window API's platform.h
+    _GLFW_PLATFORM_TOUCH_STATE;
 };
 
 // Gamepad mapping element structure

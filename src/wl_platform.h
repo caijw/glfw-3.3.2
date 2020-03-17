@@ -74,6 +74,7 @@ typedef VkBool32 (APIENTRY *PFN_vkGetPhysicalDeviceWaylandPresentationSupportKHR
 #define _GLFW_PLATFORM_LIBRARY_WINDOW_STATE _GLFWlibraryWayland wl
 #define _GLFW_PLATFORM_MONITOR_STATE        _GLFWmonitorWayland wl
 #define _GLFW_PLATFORM_CURSOR_STATE         _GLFWcursorWayland  wl
+#define _GLFW_PLATFORM_TOUCH_STATE          _GLFWTouchWayland   wl
 
 #define _GLFW_PLATFORM_CONTEXT_STATE         struct { int dummyContext; }
 #define _GLFW_PLATFORM_LIBRARY_CONTEXT_STATE struct { int dummyLibraryContext; }
@@ -191,6 +192,8 @@ typedef struct _GLFWwindowWayland
 
     _GLFWcursor*                currentCursor;
     double                      cursorPosX, cursorPosY;
+    
+    _GLFWtouch*                 touches; // touch 节点信息缓存
 
     char*                       title;
 
@@ -309,6 +312,7 @@ typedef struct _GLFWlibraryWayland
 
     _GLFWwindow*                pointerFocus;
     _GLFWwindow*                keyboardFocus;
+    _GLFWwindow*                touchFocus;
 
     struct {
         void*                   handle;
@@ -355,6 +359,14 @@ typedef struct _GLFWcursorWayland
     int                         currentImage;
 } _GLFWcursorWayland;
 
+// Wayland-specific per-touch data
+//
+typedef struct _GLFWtouchWayland
+{
+    struct wl_touch*           touch;
+    double x, y;
+    int id;
+} _GLFWtouchWayland;
 
 void _glfwAddOutputWayland(uint32_t name, uint32_t version);
 

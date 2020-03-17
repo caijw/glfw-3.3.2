@@ -137,11 +137,11 @@ static void pointerHandleEnter(void* data,
 
     window->wl.decorations.focus = focus;
     _glfw.wl.serial = serial;
-    _glfw.wl.pointerFocus = window;
+    _glfw.wl.pointerFocus = window; // 记录 pointer 是在哪个 window 的
 
     window->wl.hovered = GLFW_TRUE;
 
-    _glfwPlatformSetCursor(window, window->wl.currentCursor);
+    _glfwPlatformSetCursor(window, window->wl.currentCursor); // 显示 cursor
     _glfwInputCursorEnter(window, GLFW_TRUE);
 }
 
@@ -352,8 +352,12 @@ static void pointerHandleButton(void* data,
     }
 
     // Don’t pass the button to the user if it was related to a decoration.
-    if (window->wl.decorations.focus != mainWindow)
+    // TODO decorations 是什么
+    if (window->wl.decorations.focus != mainWindow){
+        printf("[c++][glfw][pointerHandleButton]window->wl.decorations.focus != mainWindow")
         return;
+    }
+        
 
     _glfw.wl.serial = serial;
 
@@ -742,17 +746,32 @@ static void touchHandleDown(void *data,
         if (!window)
             return;
     }
-
-    window->wl.decorations.focus = focus;
     _glfw.wl.serial = serial;
-    _glfw.wl.pointerFocus = window;
+    _glfw.wl.touchFocus = window;
 
-    window->wl.hovered = GLFW_TRUE;
+    addTouch(window, wl_touch, time, id, x, y); 
+}
 
-    _glfwPlatformSetCursor(window, window->wl.currentCursor);
-    _glfwInputCursorEnter(window, GLFW_TRUE);
+static void addTouch(_GLFWwindow* window,
+                    struct wl_touch *wl_touch,
+                    uint32_t time,
+                    int32_t id,
+                    wl_fixed_t x,
+                    wl_fixed_t y)
+{
+    
+}
+
+static void updateTouch(_GLFWwindow* window,
+                    struct wl_touch *wl_touch,
+                    uint32_t time,
+                    int32_t id,
+                    wl_fixed_t x,
+                    wl_fixed_t y)
+{
 
 }
+
 
 static void touchHandleUp(void *data,
 		                  struct wl_touch *wl_touch,
