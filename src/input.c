@@ -834,7 +834,21 @@ GLFWAPI void glfwSetCursor(GLFWwindow* windowHandle, GLFWcursor* cursorHandle)
     _glfwPlatformSetCursor(window, cursor);
 }
 
-GLFWAPI GLFWtouch* glfwCreateTouch(_GLFWwindow* window, int32_t id, double x, double y)
+GLFWAPI _GLFWtouch* glfwGetTouch(_GLFWwindow* window, int32_t id)
+{
+    _GLFWtouch* touch;
+    for (touch = window->wl.touches; touch; touch = touch->next)
+    {
+        if (touch->wl.id == id)
+        {   
+            break;
+        }
+    }
+    return touch;
+}
+
+// TODO id 可能被 wayland 回收，确认 touch 销毁逻辑
+GLFWAPI GLFWtouch* glfwCreateTouch(_GLFWwindow* window, uint32_t time, int32_t id, double x, double y)
 {
     _GLFWtouch* touch;
 
@@ -842,10 +856,28 @@ GLFWAPI GLFWtouch* glfwCreateTouch(_GLFWwindow* window, int32_t id, double x, do
 
     touch = calloc(1, sizeof(_GLFWtouch));
     if (!touch) {
-        // TODO throw error
+        // TODO throw an error
+        return (GLFWtouch*) touch;
+    }
+    touch->wl.ctime = touch->wl.utime = time;
+    touch->wl.id = id;
+    touch->wl.x = x;
+    touch->wl.y = y;
+    return (GLFWtouch*) touch;
+}
+
+GLFWAPI GLFWtouch* glfwUpdateTouch(_GLFWwindow* window, uint32_t time, int32_t id, double x, double y)
+{
+    _GLFWtouch* touch = glfwGetTouch(window, id);
+    if (touch)
+    {   
+        touch->wl.utime = time;
+        touch->wl.x = x;
+        touch->wl.y = y;
     }
     return (GLFWtouch*) touch;
 }
+
 // TODO find out when to release the touch created before
 GLFWAPI void glfwDestroyTouch(GLFWtouch* handle)
 {
@@ -873,6 +905,7 @@ GLFWAPI void glfwDestroyTouch(GLFWtouch* handle)
     }
 
     free(touch);
+    return true;
 }
 
 GLFWAPI GLFWkeyfun glfwSetKeyCallback(GLFWwindow* handle, GLFWkeyfun cbfun)

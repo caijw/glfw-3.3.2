@@ -219,11 +219,11 @@ static bool addTouch(_GLFWwindow* window,
 {
     double x = wl_fixed_to_double(sx);
     double y = wl_fixed_to_double(sy);
-    GLFWtouch* touch = glfwCreateTouch(window, id, x, y);
+    GLFWtouch* touch = glfwCreateTouch(window, uint32_t time, id, x, y);
     if (touch) {
         // add to link
         touch->next = window->wl.touches;
-        window->touches = touch;
+        window->wl.touches = touch;
         return true;
     } else {
         return false;
@@ -234,10 +234,13 @@ static bool updateTouch(_GLFWwindow* window,
                     struct wl_touch *wl_touch,
                     uint32_t time,
                     int32_t id,
-                    wl_fixed_t x,
-                    wl_fixed_t y)
+                    wl_fixed_t sx,
+                    wl_fixed_t sy)
 {
-    return true;
+    double x = wl_fixed_to_double(sx);
+    double y = wl_fixed_to_double(sy);
+    GLFWtouch* touch = glfwUpdateTouch(window, uint32_t time, id, x, y);
+    return touch ? true : false;
 }
 
 // remove wrapped touch on glfw window object
@@ -245,10 +248,12 @@ static bool removeTouch(_GLFWwindow* window,
                     struct wl_touch *wl_touch,
                     uint32_t time,
                     int32_t id,
-                    wl_fixed_t x,
-                    wl_fixed_t y)
+                    wl_fixed_t sx,
+                    wl_fixed_t sy)
 {
-    return true;
+    double x = wl_fixed_to_double(sx);
+    double y = wl_fixed_to_double(sy);
+    return glfwDestroyTouch(glfwGetTouch(window, id));
 }
 
 // pointer motion
@@ -795,7 +800,7 @@ static void touchHandleDown(void *data,
     if (!hasAddTouch) {
         return;
     }
-
+    
 
 }
 
