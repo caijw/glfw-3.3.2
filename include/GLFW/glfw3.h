@@ -336,7 +336,13 @@ extern "C" {
  *  @ingroup input
  */
 #define GLFW_TOUCH_UP               3
-
+/*! @brief touch cancel.
+ *
+ *  touch cancel.
+ *
+ *  @ingroup input
+ */
+#define GLFW_TOUCH_CANCEL           4
 /*! @} */
 
 /*! @defgroup hat_state Joystick hat states
