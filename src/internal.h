@@ -732,7 +732,7 @@ void _glfwInputChar(_GLFWwindow* window,
                     unsigned int codepoint, int mods, GLFWbool plain);
 void _glfwInputScroll(_GLFWwindow* window, double xoffset, double yoffset);
 void _glfwInputMouseClick(_GLFWwindow* window, int button, int action, int mods);
-void _glfwTouch(_GLFWwindow* window, double x, double y, int action, uint32_t time);
+void _glfwTouch(_GLFWwindow* window, double x, double y, int action, uint32_t time, int32_t id);
 void _glfwInputCursorPos(_GLFWwindow* window, double xpos, double ypos);
 void _glfwInputCursorEnter(_GLFWwindow* window, GLFWbool entered);
 void _glfwInputDrop(_GLFWwindow* window, int count, const char** names);
