@@ -1636,7 +1636,7 @@ typedef void (* GLFWdropfun)(GLFWwindow*,int,const char*[]);
  *  @ingroup input
  */
 // touch 事件回调函数签名
-typedef void (* GLFWtouchfun)(GLFWwindow*,int,int,int);
+typedef void (* GLFWtouchfun)(GLFWwindow*,double,double,int,uint32_t);
 
 /*! @brief The function pointer type for monitor configuration callbacks.
  *
@@ -4830,6 +4830,36 @@ GLFWAPI GLFWcursorenterfun glfwSetCursorEnterCallback(GLFWwindow* window, GLFWcu
  *  @ingroup input
  */
 GLFWAPI GLFWscrollfun glfwSetScrollCallback(GLFWwindow* window, GLFWscrollfun callback);
+
+/*! @brief Sets the touch callback.
+ *
+ *  This function sets the touch callback of the specified window
+ *
+ *
+ *  @param[in] window The window whose callback to set.
+ *  @param[in] callback The new touch callback, or `NULL` to remove the
+ *  currently set callback.
+ *  @return The previously set callback, or `NULL` if no callback was set or the
+ *  library had not been [initialized](@ref intro_init).
+ *
+ *  @callback_signature
+ *  @code
+ *  void function_name(GLFWwindow* window, double x, double y, int action, uint32_t time)
+ *  @endcode
+ *  For more information about the callback parameters, see the
+ *  [function pointer type](@ref GLFWtouchfun).
+ *
+ *  @errors Possible errors include @ref GLFW_NOT_INITIALIZED.
+ *
+ *  @thread_safety This function must only be called from the main thread.
+ *
+ *  @sa @ref touch
+ *
+ *  @since Added in version x.x.
+ *
+ *  @ingroup input
+ */
+GLFWAPI GLFWtouchfun glfwSetTouchCallback(GLFWwindow* window, GLFWtouchfun callback);
 
 /*! @brief Sets the path drop callback.
  *

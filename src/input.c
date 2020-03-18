@@ -992,7 +992,6 @@ GLFWAPI GLFWdropfun glfwSetDropCallback(GLFWwindow* handle, GLFWdropfun cbfun)
     return cbfun;
 }
 // 注册 touch 回调
-// TODO
 GLFWAPI GLFWtouchfun glfwSetTouchCallback(GLFWwindow* handle, GLFWtouchfun cbfun)
 {
     _GLFWwindow* window = (_GLFWwindow*) handle;
