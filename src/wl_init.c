@@ -774,12 +774,8 @@ static GLFWbool updateTouch(_GLFWwindow* window,
 static GLFWbool removeTouch(_GLFWwindow* window,
                     struct wl_touch *wl_touch,
                     uint32_t time,
-                    int32_t id,
-                    wl_fixed_t sx,
-                    wl_fixed_t sy)
+                    int32_t id)
 {
-    double x = wl_fixed_to_double(sx);
-    double y = wl_fixed_to_double(sy);
     return glfwDestroyTouch(glfwGetTouch(window, id));
 }
 
@@ -832,6 +828,14 @@ static void touchHandleUp(void *data,
     if (!window)
         return;
     _glfw.wl.serial = serial;
+    _GLFWtouch* touch = glfwGetTouch(window, id);
+    _glfwTouch(window, touch->wl.x, touch->wl.y, GLFW_TOUCH_UP, time);
+    GLFWbool hasRemoveTouch = removeTouch(window, wl_touch, time, id);
+    if (!hasRemoveTouch) {
+        return;
+    }
+
+    
 }
 
 static void touchHandleMotion(void *data,
@@ -843,14 +847,15 @@ static void touchHandleMotion(void *data,
 {
     printf("[c++][glfw][touchHandleMotion][%d]time %d, id %d, x %d, y %d,\n", timestamp(), time, id, sx, sy);
     _GLFWwindow* window = _glfw.wl.touchFocus;
-    double x, y;
     if (!window)
         return;
     GLFWbool hasUpdateTouch = updateTouch(window, wl_touch, time, id, sx, sy); 
     if (!hasUpdateTouch) {
         return;
     }
-
+    double x = wl_fixed_to_double(sx);
+    double y = wl_fixed_to_double(sy);
+    _glfwTouch(window, x, y, GLFW_TOUCH_MOVE, time);
 }
 
 static void touchHandleFrame(void *data,
