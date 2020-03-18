@@ -121,7 +121,7 @@ static void pointerHandleEnter(void* data,
                                wl_fixed_t sx,
                                wl_fixed_t sy)
 {
-    // printf("[c++][glfw][pointerHandleEnter][%d]serial %d, sx %d, sy %d,\n", timestamp(), serial, sx, sy);
+    printf("[c++][glfw][pointerHandleEnter][%d]serial %d, sx %d, sy %d,\n", timestamp(), serial, sx, sy);
     // Happens in the case we just destroyed the surface.
     if (!surface)
         return;
@@ -151,6 +151,8 @@ static void pointerHandleLeave(void* data,
                                uint32_t serial,
                                struct wl_surface* surface)
 {
+    printf("[c++][glfw][pointerHandleLeave][%d]serial %d\n", timestamp(), serial);
+
     _GLFWwindow* window = _glfw.wl.pointerFocus;
 
     if (!window)
@@ -264,6 +266,8 @@ static void pointerHandleMotion(void* data,
                                 wl_fixed_t sx,
                                 wl_fixed_t sy)
 {
+    printf("[c++][glfw][pointerHandleMotion][%d]time %d, sx %d, sy %d\n", timestamp(), time, sx, sy);
+
     _GLFWwindow* window = _glfw.wl.pointerFocus;
     const char* cursorName = NULL;
     double x, y;
