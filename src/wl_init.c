@@ -67,7 +67,6 @@ void print_callstack()
 	int stack_num = backtrace(array, size);
 	char **stacktrace = NULL;
  
-	printf("[c++][glfw][print_callstack]%s begin\n", __func__);
 	stacktrace = (char**)backtrace_symbols(array, stack_num);
  
 	for (i = 0; i < stack_num; i++)
@@ -75,7 +74,6 @@ void print_callstack()
 		printf("%s\n", stacktrace[i]);
 	}
 	free(stacktrace);
-	printf("[c++][glfw][print_callstack]%s end\n", __func__);
 }
 
 
@@ -211,53 +209,7 @@ static void setCursor(_GLFWwindow* window, const char* name)
     _glfw.wl.cursorPreviousName = name;
 }
 
-// add wrapped touch to glfw window object
-static GLFWbool addTouch(_GLFWwindow* window,
-                    struct wl_touch *wl_touch,
-                    uint32_t time,
-                    int32_t id,
-                    wl_fixed_t sx,
-                    wl_fixed_t sy)
-{
-    double x = wl_fixed_to_double(sx);
-    double y = wl_fixed_to_double(sy);
-    _GLFWtouch* touch = glfwCreateTouch(window, time, id, x, y);
-    // _GLFWtouch* touch = (_GLFWtouch*) glfwCreateTouch(window, time, id, x, y);
-    if (touch) {
-        // add to link
-        touch->next = window->wl.touches;
-        window->wl.touches = touch;
-        return GLFW_TRUE;
-    } else {
-        return GLFW_FALSE;
-    }
-}
-// update wrapped touch on glfw window object
-static GLFWbool updateTouch(_GLFWwindow* window,
-                    struct wl_touch *wl_touch,
-                    uint32_t time,
-                    int32_t id,
-                    wl_fixed_t sx,
-                    wl_fixed_t sy)
-{
-    double x = wl_fixed_to_double(sx);
-    double y = wl_fixed_to_double(sy);
-    _GLFWtouch* touch = glfwUpdateTouch(window, time, id, x, y);
-    return touch ? GLFW_TRUE : GLFW_FALSE;
-}
 
-// remove wrapped touch on glfw window object
-static GLFWbool removeTouch(_GLFWwindow* window,
-                    struct wl_touch *wl_touch,
-                    uint32_t time,
-                    int32_t id,
-                    wl_fixed_t sx,
-                    wl_fixed_t sy)
-{
-    double x = wl_fixed_to_double(sx);
-    double y = wl_fixed_to_double(sy);
-    return glfwDestroyTouch(glfwGetTouch(window, id));
-}
 
 // pointer motion
 static void pointerHandleMotion(void* data,
@@ -433,6 +385,8 @@ static void pointerHandleAxis(void* data,
                               uint32_t axis,
                               wl_fixed_t value)
 {
+    printf("[c++][glfw][pointerHandleAxis][%d]time %d, axis %d, value %d\n", timestamp(), time, axis, value);
+
     _GLFWwindow* window = _glfw.wl.pointerFocus;
     double x = 0.0, y = 0.0;
     // Wayland scroll events are in pointer motion coordinate space (think two
@@ -468,6 +422,7 @@ static void keyboardHandleKeymap(void* data,
                                  int fd,
                                  uint32_t size)
 {
+    printf("[c++][glfw][keyboardHandleKeymap][%d]\n", timestamp());
     struct xkb_keymap* keymap;
     struct xkb_state* state;
 
@@ -571,6 +526,7 @@ static void keyboardHandleEnter(void* data,
                                 struct wl_surface* surface,
                                 struct wl_array* keys)
 {
+    printf("[c++][glfw][keyboardHandleEnter][%d]serial %d\n", timestamp(), serial);
     // Happens in the case we just destroyed the surface.
     if (!surface)
         return;
@@ -594,6 +550,7 @@ static void keyboardHandleLeave(void* data,
                                 uint32_t serial,
                                 struct wl_surface* surface)
 {
+    printf("[c++][glfw][keyboardHandleLeave][%d]serial %d\n", timestamp(), serial);
     _GLFWwindow* window = _glfw.wl.keyboardFocus;
 
     if (!window)
@@ -670,6 +627,7 @@ static void keyboardHandleKey(void* data,
                               uint32_t key,
                               uint32_t state)
 {
+    printf("[c++][glfw][keyboardHandleKey][%d]serial %d, time %d, key %d, state %d\n", timestamp(), serial, time, key, state);
     int keyCode;
     int action;
     _GLFWwindow* window = _glfw.wl.keyboardFocus;
@@ -714,6 +672,8 @@ static void keyboardHandleModifiers(void* data,
                                     uint32_t modsLocked,
                                     uint32_t group)
 {
+    printf("[c++][glfw][keyboardHandleModifiers][%d]serial %d, modsDepressed %d, modsLatched %d, modsLocked %d, group %d\n", timestamp(), serial, modsDepressed, modsLatched, modsLocked, group);
+
     xkb_mod_mask_t mask;
     unsigned int modifiers = 0;
 
@@ -774,6 +734,54 @@ static const struct wl_keyboard_listener keyboardListener = {
     keyboardHandleRepeatInfo,
 #endif
 };
+
+// add wrapped touch to glfw window object
+static GLFWbool addTouch(_GLFWwindow* window,
+                    struct wl_touch *wl_touch,
+                    uint32_t time,
+                    int32_t id,
+                    wl_fixed_t sx,
+                    wl_fixed_t sy)
+{
+    double x = wl_fixed_to_double(sx);
+    double y = wl_fixed_to_double(sy);
+    _GLFWtouch* touch = glfwCreateTouch(window, time, id, x, y);
+    // _GLFWtouch* touch = (_GLFWtouch*) glfwCreateTouch(window, time, id, x, y);
+    if (touch) {
+        // add to link
+        touch->next = window->wl.touches;
+        window->wl.touches = touch;
+        return GLFW_TRUE;
+    } else {
+        return GLFW_FALSE;
+    }
+}
+// update wrapped touch on glfw window object
+static GLFWbool updateTouch(_GLFWwindow* window,
+                    struct wl_touch *wl_touch,
+                    uint32_t time,
+                    int32_t id,
+                    wl_fixed_t sx,
+                    wl_fixed_t sy)
+{
+    double x = wl_fixed_to_double(sx);
+    double y = wl_fixed_to_double(sy);
+    _GLFWtouch* touch = glfwUpdateTouch(window, time, id, x, y);
+    return touch ? GLFW_TRUE : GLFW_FALSE;
+}
+
+// remove wrapped touch on glfw window object
+static GLFWbool removeTouch(_GLFWwindow* window,
+                    struct wl_touch *wl_touch,
+                    uint32_t time,
+                    int32_t id,
+                    wl_fixed_t sx,
+                    wl_fixed_t sy)
+{
+    double x = wl_fixed_to_double(sx);
+    double y = wl_fixed_to_double(sy);
+    return glfwDestroyTouch(glfwGetTouch(window, id));
+}
 
 // touch down
 static void touchHandleDown(void *data,
