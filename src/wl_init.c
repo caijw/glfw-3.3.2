@@ -119,7 +119,7 @@ static void pointerHandleEnter(void* data,
                                wl_fixed_t sx,
                                wl_fixed_t sy)
 {
-    printf("[c++][glfw][pointerHandleEnter][%d]serial %d, sx %d, sy %d,\n", timestamp(), serial, sx, sy);
+    // printf("[c++][glfw][pointerHandleEnter][%d]serial %d, sx %d, sy %d,\n", timestamp(), serial, sx, sy);
     // Happens in the case we just destroyed the surface.
     if (!surface)
         return;
@@ -149,7 +149,7 @@ static void pointerHandleLeave(void* data,
                                uint32_t serial,
                                struct wl_surface* surface)
 {
-    printf("[c++][glfw][pointerHandleLeave][%d]serial %d\n", timestamp(), serial);
+    // printf("[c++][glfw][pointerHandleLeave][%d]serial %d\n", timestamp(), serial);
 
     _GLFWwindow* window = _glfw.wl.pointerFocus;
 
@@ -218,7 +218,7 @@ static void pointerHandleMotion(void* data,
                                 wl_fixed_t sx,
                                 wl_fixed_t sy)
 {
-    printf("[c++][glfw][pointerHandleMotion][%d]time %d, sx %d, sy %d\n", timestamp(), time, sx, sy);
+    // printf("[c++][glfw][pointerHandleMotion][%d]time %d, sx %d, sy %d\n", timestamp(), time, sx, sy);
 
     _GLFWwindow* window = _glfw.wl.pointerFocus;
     const char* cursorName = NULL;
@@ -281,7 +281,7 @@ static void pointerHandleButton(void* data,
                                 uint32_t button,
                                 uint32_t state)
 {
-    printf("[c++][glfw][pointerHandleButton][%d]serial %d, time %d, button %d, state %d\n", timestamp(), serial, time, button, state);
+    // printf("[c++][glfw][pointerHandleButton][%d]serial %d, time %d, button %d, state %d\n", timestamp(), serial, time, button, state);
 
     _GLFWwindow* window = _glfw.wl.pointerFocus;
     int glfwButton;
@@ -385,7 +385,7 @@ static void pointerHandleAxis(void* data,
                               uint32_t axis,
                               wl_fixed_t value)
 {
-    printf("[c++][glfw][pointerHandleAxis][%d]time %d, axis %d, value %d\n", timestamp(), time, axis, value);
+    // printf("[c++][glfw][pointerHandleAxis][%d]time %d, axis %d, value %d\n", timestamp(), time, axis, value);
 
     _GLFWwindow* window = _glfw.wl.pointerFocus;
     double x = 0.0, y = 0.0;
@@ -422,7 +422,7 @@ static void keyboardHandleKeymap(void* data,
                                  int fd,
                                  uint32_t size)
 {
-    printf("[c++][glfw][keyboardHandleKeymap][%d]\n", timestamp());
+    // printf("[c++][glfw][keyboardHandleKeymap][%d]\n", timestamp());
     struct xkb_keymap* keymap;
     struct xkb_state* state;
 
@@ -526,7 +526,7 @@ static void keyboardHandleEnter(void* data,
                                 struct wl_surface* surface,
                                 struct wl_array* keys)
 {
-    printf("[c++][glfw][keyboardHandleEnter][%d]serial %d\n", timestamp(), serial);
+    // printf("[c++][glfw][keyboardHandleEnter][%d]serial %d\n", timestamp(), serial);
     // Happens in the case we just destroyed the surface.
     if (!surface)
         return;
@@ -550,7 +550,7 @@ static void keyboardHandleLeave(void* data,
                                 uint32_t serial,
                                 struct wl_surface* surface)
 {
-    printf("[c++][glfw][keyboardHandleLeave][%d]serial %d\n", timestamp(), serial);
+    // printf("[c++][glfw][keyboardHandleLeave][%d]serial %d\n", timestamp(), serial);
     _GLFWwindow* window = _glfw.wl.keyboardFocus;
 
     if (!window)
@@ -627,7 +627,7 @@ static void keyboardHandleKey(void* data,
                               uint32_t key,
                               uint32_t state)
 {
-    printf("[c++][glfw][keyboardHandleKey][%d]serial %d, time %d, key %d, state %d\n", timestamp(), serial, time, key, state);
+    // printf("[c++][glfw][keyboardHandleKey][%d]serial %d, time %d, key %d, state %d\n", timestamp(), serial, time, key, state);
     int keyCode;
     int action;
     _GLFWwindow* window = _glfw.wl.keyboardFocus;
@@ -672,7 +672,7 @@ static void keyboardHandleModifiers(void* data,
                                     uint32_t modsLocked,
                                     uint32_t group)
 {
-    printf("[c++][glfw][keyboardHandleModifiers][%d]serial %d, modsDepressed %d, modsLatched %d, modsLocked %d, group %d\n", timestamp(), serial, modsDepressed, modsLatched, modsLocked, group);
+    // printf("[c++][glfw][keyboardHandleModifiers][%d]serial %d, modsDepressed %d, modsLatched %d, modsLocked %d, group %d\n", timestamp(), serial, modsDepressed, modsLatched, modsLocked, group);
 
     xkb_mod_mask_t mask;
     unsigned int modifiers = 0;
