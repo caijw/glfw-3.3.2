@@ -804,14 +804,10 @@ static void touchHandleDown(void *data,
 
     _glfw.wl.serial = serial;
     _glfw.wl.touchFocus = window;
-
-    GLFWbool hasAddTouch = addTouch(window, wl_touch, time, id, sx, sy); // 增加 touch
-    if (!hasAddTouch) {
-        return;
-    }
     double x = wl_fixed_to_double(sx);
     double y = wl_fixed_to_double(sy);
     _glfwTouch(window, x, y, GLFW_TOUCH_DOWN, time);
+    addTouch(window, wl_touch, time, id, sx, sy); // 增加 touch
 }
 
 // wayland 没有给 touch up 的坐标信息
@@ -830,12 +826,7 @@ static void touchHandleUp(void *data,
     _glfw.wl.serial = serial;
     _GLFWtouch* touch = glfwGetTouch(window, id);
     _glfwTouch(window, touch->wl.x, touch->wl.y, GLFW_TOUCH_UP, time);
-    GLFWbool hasRemoveTouch = removeTouch(window, wl_touch, time, id);
-    if (!hasRemoveTouch) {
-        return;
-    }
-
-    
+    removeTouch(window, wl_touch, time, id);
 }
 
 static void touchHandleMotion(void *data,
@@ -849,13 +840,10 @@ static void touchHandleMotion(void *data,
     _GLFWwindow* window = _glfw.wl.touchFocus;
     if (!window)
         return;
-    GLFWbool hasUpdateTouch = updateTouch(window, wl_touch, time, id, sx, sy); 
-    if (!hasUpdateTouch) {
-        return;
-    }
     double x = wl_fixed_to_double(sx);
     double y = wl_fixed_to_double(sy);
     _glfwTouch(window, x, y, GLFW_TOUCH_MOVE, time);
+    updateTouch(window, wl_touch, time, id, sx, sy); 
 }
 
 static void touchHandleFrame(void *data,
