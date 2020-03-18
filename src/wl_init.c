@@ -806,7 +806,7 @@ static void touchHandleDown(void *data,
     _glfw.wl.touchFocus = window;
     double x = wl_fixed_to_double(sx);
     double y = wl_fixed_to_double(sy);
-    _glfwTouch(window, x, y, GLFW_TOUCH_DOWN, time);
+    _glfwTouch(window, x, y, GLFW_TOUCH_DOWN, time, id);
     addTouch(window, wl_touch, time, id, sx, sy); // 增加 touch
 }
 
@@ -825,7 +825,7 @@ static void touchHandleUp(void *data,
         return;
     _glfw.wl.serial = serial;
     _GLFWtouch* touch = glfwGetTouch(window, id);
-    _glfwTouch(window, touch->wl.x, touch->wl.y, GLFW_TOUCH_UP, time);
+    _glfwTouch(window, touch->wl.x, touch->wl.y, GLFW_TOUCH_UP, time, id);
     removeTouch(window, wl_touch, time, id);
 }
 
@@ -842,7 +842,7 @@ static void touchHandleMotion(void *data,
         return;
     double x = wl_fixed_to_double(sx);
     double y = wl_fixed_to_double(sy);
-    _glfwTouch(window, x, y, GLFW_TOUCH_MOVE, time);
+    _glfwTouch(window, x, y, GLFW_TOUCH_MOVE, time, id);
     updateTouch(window, wl_touch, time, id, sx, sy); 
 }
 

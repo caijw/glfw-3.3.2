@@ -1636,7 +1636,7 @@ typedef void (* GLFWdropfun)(GLFWwindow*,int,const char*[]);
  *  @ingroup input
  */
 // touch 事件回调函数签名
-typedef void (* GLFWtouchfun)(GLFWwindow*,double,double,int,uint32_t);
+typedef void (* GLFWtouchfun)(GLFWwindow*,double,double,int,uint32_t,int32_t);
 
 /*! @brief The function pointer type for monitor configuration callbacks.
  *
