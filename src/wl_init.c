@@ -831,13 +831,7 @@ static void touchHandleUp(void *data,
 
     if (!window)
         return;
-
-    window->wl.hovered = GLFW_FALSE;
-
     _glfw.wl.serial = serial;
-    _glfw.wl.pointerFocus = NULL;
-    _glfwInputCursorEnter(window, GLFW_FALSE);
-    _glfw.wl.cursorPreviousName = NULL;
 }
 
 static void touchHandleMotion(void *data,
