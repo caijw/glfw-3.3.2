@@ -342,11 +342,11 @@ void _glfwInputMouseClick(_GLFWwindow* window, int button, int action, int mods)
         window->callbacks.mouseButton((GLFWwindow*) window, button, action, mods);
 }
 
-void _glfwTouch(_GLFWwindow* window, double x, double y, int action, uint32_t time)
+void _glfwTouch(_GLFWwindow* window, double x, double y, int action, uint32_t time, int32_t id)
 {
     if (window->callbacks.touch)
     {
-        window->callbacks.touch((GLFWwindow*) window, x, y, action, time);
+        window->callbacks.touch((GLFWwindow*) window, x, y, action, time, id);
     }
 }
 
