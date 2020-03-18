@@ -801,8 +801,9 @@ static void touchHandleDown(void *data,
     if (!hasAddTouch) {
         return;
     }
-
-
+    double x = wl_fixed_to_double(sx);
+    double y = wl_fixed_to_double(sy);
+    _glfwTouch(window, x, y, GLFW_TOUCH_DOWN, time);
 }
 
 // wayland 没有给 touch up 的坐标信息

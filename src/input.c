@@ -342,6 +342,14 @@ void _glfwInputMouseClick(_GLFWwindow* window, int button, int action, int mods)
         window->callbacks.mouseButton((GLFWwindow*) window, button, action, mods);
 }
 
+void _glfwTouch(_GLFWwindow* window, double x, double y, int action, uint32_t time)
+{
+    if (window->callbacks.touch)
+    {
+        window->callbacks.touch((GLFWwindow*) window, x, y, action, time);
+    }
+}
+
 // Notifies shared code of a cursor motion event
 // The position is specified in content area relative screen coordinates
 //
