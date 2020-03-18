@@ -364,8 +364,8 @@ typedef struct _GLFWcursorWayland
 typedef struct _GLFWtouchWayland
 {
     struct wl_touch*           touch;
-    uint32_t ctime,
-    uint32_t utime,
+    uint32_t ctime;
+    uint32_t utime;
     uint32_t id;
     double x, y;
 } _GLFWtouchWayland;

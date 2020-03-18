@@ -210,7 +210,7 @@ static void setCursor(_GLFWwindow* window, const char* name)
 }
 
 // add wrapped touch to glfw window object
-static bool addTouch(_GLFWwindow* window,
+static GLFWbool addTouch(_GLFWwindow* window,
                     struct wl_touch *wl_touch,
                     uint32_t time,
                     int32_t id,
@@ -219,18 +219,19 @@ static bool addTouch(_GLFWwindow* window,
 {
     double x = wl_fixed_to_double(sx);
     double y = wl_fixed_to_double(sy);
-    GLFWtouch* touch = glfwCreateTouch(window, uint32_t time, id, x, y);
+    _GLFWtouch* touch = glfwCreateTouch(window, time, id, x, y);
+    // _GLFWtouch* touch = (_GLFWtouch*) glfwCreateTouch(window, time, id, x, y);
     if (touch) {
         // add to link
         touch->next = window->wl.touches;
         window->wl.touches = touch;
-        return true;
+        return GLFW_TRUE;
     } else {
-        return false;
+        return GLFW_FALSE;
     }
 }
 // update wrapped touch on glfw window object
-static bool updateTouch(_GLFWwindow* window,
+static GLFWbool updateTouch(_GLFWwindow* window,
                     struct wl_touch *wl_touch,
                     uint32_t time,
                     int32_t id,
@@ -239,12 +240,12 @@ static bool updateTouch(_GLFWwindow* window,
 {
     double x = wl_fixed_to_double(sx);
     double y = wl_fixed_to_double(sy);
-    GLFWtouch* touch = glfwUpdateTouch(window, uint32_t time, id, x, y);
-    return touch ? true : false;
+    _GLFWtouch* touch = glfwUpdateTouch(window, time, id, x, y);
+    return touch ? GLFW_TRUE : GLFW_FALSE;
 }
 
 // remove wrapped touch on glfw window object
-static bool removeTouch(_GLFWwindow* window,
+static GLFWbool removeTouch(_GLFWwindow* window,
                     struct wl_touch *wl_touch,
                     uint32_t time,
                     int32_t id,
@@ -796,11 +797,11 @@ static void touchHandleDown(void *data,
     _glfw.wl.serial = serial;
     _glfw.wl.touchFocus = window;
 
-    bool hasAddTouch = addTouch(window, wl_touch, time, id, sx, sy); // 增加 touch
+    GLFWbool hasAddTouch = addTouch(window, wl_touch, time, id, sx, sy); // 增加 touch
     if (!hasAddTouch) {
         return;
     }
-    
+
 
 }
 
@@ -838,7 +839,7 @@ static void touchHandleMotion(void *data,
     double x, y;
     if (!window)
         return;
-    bool hasUpdateTouch = updateTouch(window, wl_touch, time, id, sx, sy); 
+    GLFWbool hasUpdateTouch = updateTouch(window, wl_touch, time, id, sx, sy); 
     if (!hasUpdateTouch) {
         return;
     }

@@ -834,7 +834,7 @@ GLFWAPI void glfwSetCursor(GLFWwindow* windowHandle, GLFWcursor* cursorHandle)
     _glfwPlatformSetCursor(window, cursor);
 }
 
-GLFWAPI _GLFWtouch* glfwGetTouch(_GLFWwindow* window, int32_t id)
+_GLFWtouch* glfwGetTouch(_GLFWwindow* window, int32_t id)
 {
     _GLFWtouch* touch;
     for (touch = window->wl.touches; touch; touch = touch->next)
@@ -848,7 +848,7 @@ GLFWAPI _GLFWtouch* glfwGetTouch(_GLFWwindow* window, int32_t id)
 }
 
 // TODO id 可能被 wayland 回收，确认 touch 销毁逻辑
-GLFWAPI GLFWtouch* glfwCreateTouch(_GLFWwindow* window, uint32_t time, int32_t id, double x, double y)
+_GLFWtouch* glfwCreateTouch(_GLFWwindow* window, uint32_t time, int32_t id, double x, double y)
 {
     _GLFWtouch* touch;
 
@@ -857,16 +857,16 @@ GLFWAPI GLFWtouch* glfwCreateTouch(_GLFWwindow* window, uint32_t time, int32_t i
     touch = calloc(1, sizeof(_GLFWtouch));
     if (!touch) {
         // TODO throw an error
-        return (GLFWtouch*) touch;
+        return touch;
     }
     touch->wl.ctime = touch->wl.utime = time;
     touch->wl.id = id;
     touch->wl.x = x;
     touch->wl.y = y;
-    return (GLFWtouch*) touch;
+    return touch;
 }
 
-GLFWAPI GLFWtouch* glfwUpdateTouch(_GLFWwindow* window, uint32_t time, int32_t id, double x, double y)
+_GLFWtouch* glfwUpdateTouch(_GLFWwindow* window, uint32_t time, int32_t id, double x, double y)
 {
     _GLFWtouch* touch = glfwGetTouch(window, id);
     if (touch)
@@ -875,18 +875,18 @@ GLFWAPI GLFWtouch* glfwUpdateTouch(_GLFWwindow* window, uint32_t time, int32_t i
         touch->wl.x = x;
         touch->wl.y = y;
     }
-    return (GLFWtouch*) touch;
+    return touch;
 }
 
 // TODO find out when to release the touch created before
-GLFWAPI void glfwDestroyTouch(GLFWtouch* handle)
+GLFWbool glfwDestroyTouch(_GLFWtouch* handle)
 {
-    _GLFWtouch* touch = (_GLFWtouch*) handle;
+    _GLFWtouch* touch = handle;
 
-    _GLFW_REQUIRE_INIT();
+    _GLFW_REQUIRE_INIT_OR_RETURN(GLFW_FALSE);
 
     if (touch == NULL)
-        return;
+        return GLFW_FALSE;
 
     // Make sure the touch is not being used by any window
     {
@@ -905,7 +905,7 @@ GLFWAPI void glfwDestroyTouch(GLFWtouch* handle)
     }
 
     free(touch);
-    return true;
+    return GLFW_TRUE;
 }
 
 GLFWAPI GLFWkeyfun glfwSetKeyCallback(GLFWwindow* handle, GLFWkeyfun cbfun)

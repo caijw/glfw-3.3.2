@@ -751,6 +751,10 @@ void _glfwInputError(int code, const char* format, ...);
 #endif
 
 
+_GLFWtouch* glfwGetTouch(_GLFWwindow* window, int32_t id);
+_GLFWtouch* glfwCreateTouch(_GLFWwindow* window, uint32_t time, int32_t id, double x, double y);
+_GLFWtouch* glfwUpdateTouch(_GLFWwindow* window, uint32_t time, int32_t id, double x, double y);
+GLFWbool glfwDestroyTouch(_GLFWtouch* handle);
 //////////////////////////////////////////////////////////////////////////
 //////                       GLFW internal API                      //////
 //////////////////////////////////////////////////////////////////////////
