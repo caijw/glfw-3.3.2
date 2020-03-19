@@ -133,14 +133,14 @@ static void pointerHandleEnter(void* data,
             return;
     }
 
-    window->wl.decorations.focus = focus;
+    window->wl.decorations.focus = focus; // 点击的是上/下/左/右/主窗口的哪一个
     _glfw.wl.serial = serial;
     _glfw.wl.pointerFocus = window; // 记录 pointer 是在哪个 window 的
 
     window->wl.hovered = GLFW_TRUE;
 
-    _glfwPlatformSetCursor(window, window->wl.currentCursor); // 显示 cursor
-    _glfwInputCursorEnter(window, GLFW_TRUE);
+    _glfwPlatformSetCursor(window, window->wl.currentCursor); // 设置 cursor 图像
+    _glfwInputCursorEnter(window, GLFW_TRUE); // 通知 enter 回调
 }
 
 // pointer leave
@@ -163,7 +163,7 @@ static void pointerHandleLeave(void* data,
     _glfwInputCursorEnter(window, GLFW_FALSE);
     _glfw.wl.cursorPreviousName = NULL;
 }
-
+// 显示一个新的 cursor
 static void setCursor(_GLFWwindow* window, const char* name)
 {
     struct wl_buffer* buffer;
@@ -234,12 +234,14 @@ static void pointerHandleMotion(void* data,
 
     switch (window->wl.decorations.focus)
     {
-        case mainWindow:
+        case mainWindow: // 点击了主窗口
+            // 坐标缓存
             window->wl.cursorPosX = x;
             window->wl.cursorPosY = y;
-            _glfwInputCursorPos(window, x, y);
+            _glfwInputCursorPos(window, x, y); // 通知 cursorPos 回调
             _glfw.wl.cursorPreviousName = NULL;
             return;
+        // 其他的各种位置的 cursorName 可以参考 https://www.w3schools.com/cssref/playit.asp?filename=playcss_cursor&preval=n-resize
         case topDecoration:
             if (y < _GLFW_DECORATION_WIDTH)
                 cursorName = "n-resize";
@@ -269,6 +271,7 @@ static void pointerHandleMotion(void* data,
         default:
             assert(0);
     }
+    // cursorName 发生变化
     if (_glfw.wl.cursorPreviousName != cursorName)
         setCursor(window, cursorName);
 }
@@ -294,6 +297,7 @@ static void pointerHandleButton(void* data,
     // left button
     if (button == BTN_LEFT)
     {
+        // 鼠标的左键，移动窗口/窗口大小调整
         switch (window->wl.decorations.focus)
         {
             case mainWindow:
@@ -356,10 +360,8 @@ static void pointerHandleButton(void* data,
     }
 
     // Don’t pass the button to the user if it was related to a decoration.
-    // TODO decorations
     if (window->wl.decorations.focus != mainWindow){
-        // 根据实际测试，点击顶部的 bar 会进入这个逻辑
-        // 即点击的不是flutter窗口渲染的内容
+        // 点击的不是主窗口
         return;
     }
         
@@ -375,7 +377,7 @@ static void pointerHandleButton(void* data,
                          state == WL_POINTER_BUTTON_STATE_PRESSED
                                 ? GLFW_PRESS
                                 : GLFW_RELEASE,
-                         _glfw.wl.xkb.modifiers);
+                         _glfw.wl.xkb.modifiers); // 通知 click 回调
 }
 
 // axis
@@ -405,7 +407,7 @@ static void pointerHandleAxis(void* data,
     else if (axis == WL_POINTER_AXIS_VERTICAL_SCROLL)
         y = wl_fixed_to_double(value) * scrollFactor;
 
-    _glfwInputScroll(window, x, y);
+    _glfwInputScroll(window, x, y); // 通知 scroll 回调
 }
 
 static const struct wl_pointer_listener pointerListener = {
@@ -818,7 +820,7 @@ static void touchHandleUp(void *data,
 		                  uint32_t time,
 		                  int32_t id)
 {
-    printf("[c++][glfw][touchHandleUp][%d]serial %d, time %d, id %d,\n", timestamp(), serial, time, id);
+    // printf("[c++][glfw][touchHandleUp][%d]serial %d, time %d, id %d,\n", timestamp(), serial, time, id);
     _GLFWwindow* window = _glfw.wl.touchFocus;
 
     if (!window)
@@ -836,7 +838,7 @@ static void touchHandleMotion(void *data,
 		                      wl_fixed_t sx,
 		                      wl_fixed_t sy)
 {
-    printf("[c++][glfw][touchHandleMotion][%d]time %d, id %d, x %d, y %d,\n", timestamp(), time, id, sx, sy);
+    // printf("[c++][glfw][touchHandleMotion][%d]time %d, id %d, x %d, y %d,\n", timestamp(), time, id, sx, sy);
     _GLFWwindow* window = _glfw.wl.touchFocus;
     if (!window)
         return;
@@ -849,13 +851,13 @@ static void touchHandleMotion(void *data,
 static void touchHandleFrame(void *data,
 		                     struct wl_touch *wl_touch)
 {
-    printf("[c++][glfw][touchHandleFrame][%d]\n", timestamp());
+    // printf("[c++][glfw][touchHandleFrame][%d]\n", timestamp());
 }
 
 static void touchHandleCancel(void *data,
 		                      struct wl_touch *wl_touch)
 {
-    printf("[c++][glfw][touchHandleCancel][%d]\n", timestamp());
+    // printf("[c++][glfw][touchHandleCancel][%d]\n", timestamp());
 }
 
 static void touchHandleShape(void *data,
@@ -864,7 +866,7 @@ static void touchHandleShape(void *data,
 		                     wl_fixed_t major,
 		                     wl_fixed_t minor)
 {
-    printf("[c++][glfw][touchHandleShape][%d] id %d, major %d, minor %d,\n", timestamp(), id, major, minor);
+    // printf("[c++][glfw][touchHandleShape][%d] id %d, major %d, minor %d,\n", timestamp(), id, major, minor);
 }
 
 static void touchHandleOrientation(void *data,
@@ -872,7 +874,7 @@ static void touchHandleOrientation(void *data,
 			                       int32_t id,
 			                       wl_fixed_t orientation)
 {
-    printf("[c++][glfw][touchHandleOrientation][%d] id %d, orientation %d,\n", timestamp(), id, orientation);
+    // printf("[c++][glfw][touchHandleOrientation][%d] id %d, orientation %d,\n", timestamp(), id, orientation);
 }
 
 static const struct wl_touch_listener touchListener = {
