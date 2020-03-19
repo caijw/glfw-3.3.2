@@ -886,7 +886,7 @@ _GLFWtouch* glfwUpdateTouch(_GLFWwindow* window, uint32_t time, int32_t id, doub
     return touch;
 }
 
-// TODO find out when to release the touch created before
+// TODO touch 回收逻辑梳理确认
 GLFWbool glfwDestroyTouch(_GLFWtouch* handle)
 {
     _GLFWtouch* touch = handle;
@@ -912,7 +912,7 @@ GLFWbool glfwDestroyTouch(_GLFWtouch* handle)
         // 如果是的话，这里需要把 global 的 link 里面的 touch 去掉
     }
 
-    free(touch);
+    // free(touch);
     return GLFW_TRUE;
 }
 
