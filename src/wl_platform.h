@@ -192,8 +192,6 @@ typedef struct _GLFWwindowWayland
 
     _GLFWcursor*                currentCursor;
     double                      cursorPosX, cursorPosY;
-    
-    _GLFWtouch*                 touches; // touch 节点信息缓存
 
     char*                       title;
 
@@ -363,7 +361,6 @@ typedef struct _GLFWcursorWayland
 //
 typedef struct _GLFWtouchWayland
 {
-    struct wl_touch*           touch;
     uint32_t ctime;
     uint32_t utime;
     uint32_t id;

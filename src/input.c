@@ -845,7 +845,7 @@ GLFWAPI void glfwSetCursor(GLFWwindow* windowHandle, GLFWcursor* cursorHandle)
 _GLFWtouch* glfwGetTouch(_GLFWwindow* window, int32_t id)
 {
     _GLFWtouch* touch;
-    for (touch = window->wl.touches; touch; touch = touch->next)
+    for (touch = _glfw.touchListHead; touch; touch = touch->next)
     {
         if (touch->wl.id == id)
         {   
@@ -855,7 +855,6 @@ _GLFWtouch* glfwGetTouch(_GLFWwindow* window, int32_t id)
     return touch;
 }
 
-// TODO id 可能被 wayland 回收，确认 touch 销毁逻辑
 _GLFWtouch* glfwCreateTouch(_GLFWwindow* window, uint32_t time, int32_t id, double x, double y)
 {
     _GLFWtouch* touch;
@@ -863,10 +862,6 @@ _GLFWtouch* glfwCreateTouch(_GLFWwindow* window, uint32_t time, int32_t id, doub
     _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
 
     touch = calloc(1, sizeof(_GLFWtouch));
-    if (!touch) {
-        // TODO throw an error
-        return touch;
-    }
     touch->wl.ctime = touch->wl.utime = time;
     touch->wl.id = id;
     touch->wl.x = x;
@@ -886,34 +881,32 @@ _GLFWtouch* glfwUpdateTouch(_GLFWwindow* window, uint32_t time, int32_t id, doub
     return touch;
 }
 
-// TODO touch 回收逻辑梳理确认
-GLFWbool glfwDestroyTouch(_GLFWtouch* handle)
+GLFWbool glfwDestroyTouch(_GLFWtouch* touch)
 {
-    _GLFWtouch* touch = handle;
 
     _GLFW_REQUIRE_INIT_OR_RETURN(GLFW_FALSE);
 
     if (touch == NULL)
         return GLFW_FALSE;
 
-    // Make sure the touch is not being used by any window
+    _GLFWtouch* preTouch;
+    _GLFWtouch* curTouch;
+    for (curTouch = _glfw.touchListHead; curTouch; curTouch = curTouch->next)
     {
-        _GLFWwindow* window;
-
-        for (window = _glfw.windowListHead;  window;  window = window->next)
-        {
-            // TODO 在 window 的 touches 链表里面找，如果不存在即可 destroy
+        if (curTouch == touch)
+        {   
+            if (curTouch == _glfw.touchListHead) {
+                _glfw.touchListHead = curTouch->next;
+            } else {
+                preTouch->next = curTouch->next;
+            }
+            free(curTouch);
+            return GLFW_TRUE;
+        } else {
+            preTouch = curTouch;
         }
     }
-
-    // Unlink touch from global linked list
-    {
-        // TODO 参考 pointer 是不是要把 touch 也挂到 global 的 link
-        // 如果是的话，这里需要把 global 的 link 里面的 touch 去掉
-    }
-
-    // free(touch);
-    return GLFW_TRUE;
+    return GLFW_FALSE;
 }
 
 GLFWAPI GLFWkeyfun glfwSetKeyCallback(GLFWwindow* handle, GLFWkeyfun cbfun)

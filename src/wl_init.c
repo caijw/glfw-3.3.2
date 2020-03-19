@@ -748,11 +748,10 @@ static GLFWbool addTouch(_GLFWwindow* window,
     double x = wl_fixed_to_double(sx);
     double y = wl_fixed_to_double(sy);
     _GLFWtouch* touch = glfwCreateTouch(window, time, id, x, y);
-    // _GLFWtouch* touch = (_GLFWtouch*) glfwCreateTouch(window, time, id, x, y);
     if (touch) {
         // add to link
-        touch->next = window->wl.touches;
-        window->wl.touches = touch;
+        touch->next = _glfw.touchListHead;
+        _glfw.touchListHead = touch;
         return GLFW_TRUE;
     } else {
         return GLFW_FALSE;
@@ -770,15 +769,6 @@ static GLFWbool updateTouch(_GLFWwindow* window,
     double y = wl_fixed_to_double(sy);
     _GLFWtouch* touch = glfwUpdateTouch(window, time, id, x, y);
     return touch ? GLFW_TRUE : GLFW_FALSE;
-}
-
-// remove wrapped touch on glfw window object
-static GLFWbool removeTouch(_GLFWwindow* window,
-                    struct wl_touch *wl_touch,
-                    uint32_t time,
-                    int32_t id)
-{
-    return glfwDestroyTouch(glfwGetTouch(window, id));
 }
 
 // touch down
@@ -809,6 +799,7 @@ static void touchHandleDown(void *data,
     double x = wl_fixed_to_double(sx);
     double y = wl_fixed_to_double(sy);
     _glfwTouch(window, x, y, GLFW_TOUCH_DOWN, time, id);
+    addTouch(window, wl_touch, time, id, sx, sy);
 }
 
 // wayland 没有给 touch up 的坐标信息
@@ -825,7 +816,11 @@ static void touchHandleUp(void *data,
     if (!window)
         return;
     _glfw.wl.serial = serial;
-    _glfwTouch(window, 0, 0, GLFW_TOUCH_UP, time, id);
+    _GLFWtouch* touch= glfwGetTouch(window, id);
+    if (touch) {
+        _glfwTouch(window, touch->wl.x, touch->wl.y, GLFW_TOUCH_UP, time, id);
+        glfwDestroyTouch(touch);
+    }
 }
 
 static void touchHandleMotion(void *data,
@@ -842,6 +837,7 @@ static void touchHandleMotion(void *data,
     double x = wl_fixed_to_double(sx);
     double y = wl_fixed_to_double(sy);
     _glfwTouch(window, x, y, GLFW_TOUCH_MOVE, time, id);
+    updateTouch(window, wl_touch, time, id, sx, sy);
 }
 
 static void touchHandleFrame(void *data,

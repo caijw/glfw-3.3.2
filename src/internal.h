@@ -538,6 +538,7 @@ struct _GLFWlibrary
     _GLFWerror*         errorListHead;
     _GLFWcursor*        cursorListHead;
     _GLFWwindow*        windowListHead;
+    _GLFWtouch*         touchListHead;
 
     _GLFWmonitor**      monitors;
     int                 monitorCount;
