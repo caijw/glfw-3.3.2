@@ -825,7 +825,7 @@ static void touchHandleUp(void *data,
     if (!window)
         return;
     _glfw.wl.serial = serial;
-    _glfwTouch(window, -1, -1, GLFW_TOUCH_UP, time, id);
+    _glfwTouch(window, 0, 0, GLFW_TOUCH_UP, time, id);
 }
 
 static void touchHandleMotion(void *data,
