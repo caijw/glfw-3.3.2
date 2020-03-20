@@ -119,7 +119,6 @@ static void pointerHandleEnter(void* data,
                                wl_fixed_t sx,
                                wl_fixed_t sy)
 {
-    // printf("[c++][glfw][pointerHandleEnter][%d]serial %d, sx %d, sy %d,\n", timestamp(), serial, sx, sy);
     // Happens in the case we just destroyed the surface.
     if (!surface)
         return;
@@ -149,7 +148,6 @@ static void pointerHandleLeave(void* data,
                                uint32_t serial,
                                struct wl_surface* surface)
 {
-    // printf("[c++][glfw][pointerHandleLeave][%d]serial %d\n", timestamp(), serial);
 
     _GLFWwindow* window = _glfw.wl.pointerFocus;
 
@@ -218,8 +216,6 @@ static void pointerHandleMotion(void* data,
                                 wl_fixed_t sx,
                                 wl_fixed_t sy)
 {
-    // printf("[c++][glfw][pointerHandleMotion][%d]time %d, sx %d, sy %d\n", timestamp(), time, sx, sy);
-
     _GLFWwindow* window = _glfw.wl.pointerFocus;
     const char* cursorName = NULL;
     double x, y;
@@ -284,8 +280,6 @@ static void pointerHandleButton(void* data,
                                 uint32_t button,
                                 uint32_t state)
 {
-    // printf("[c++][glfw][pointerHandleButton][%d]serial %d, time %d, button %d, state %d\n", timestamp(), serial, time, button, state);
-
     _GLFWwindow* window = _glfw.wl.pointerFocus;
     int glfwButton;
 
@@ -387,8 +381,6 @@ static void pointerHandleAxis(void* data,
                               uint32_t axis,
                               wl_fixed_t value)
 {
-    // printf("[c++][glfw][pointerHandleAxis][%d]time %d, axis %d, value %d\n", timestamp(), time, axis, value);
-
     _GLFWwindow* window = _glfw.wl.pointerFocus;
     double x = 0.0, y = 0.0;
     // Wayland scroll events are in pointer motion coordinate space (think two
@@ -424,7 +416,6 @@ static void keyboardHandleKeymap(void* data,
                                  int fd,
                                  uint32_t size)
 {
-    // printf("[c++][glfw][keyboardHandleKeymap][%d]\n", timestamp());
     struct xkb_keymap* keymap;
     struct xkb_state* state;
 
@@ -528,7 +519,6 @@ static void keyboardHandleEnter(void* data,
                                 struct wl_surface* surface,
                                 struct wl_array* keys)
 {
-    // printf("[c++][glfw][keyboardHandleEnter][%d]serial %d\n", timestamp(), serial);
     // Happens in the case we just destroyed the surface.
     if (!surface)
         return;
@@ -552,7 +542,6 @@ static void keyboardHandleLeave(void* data,
                                 uint32_t serial,
                                 struct wl_surface* surface)
 {
-    // printf("[c++][glfw][keyboardHandleLeave][%d]serial %d\n", timestamp(), serial);
     _GLFWwindow* window = _glfw.wl.keyboardFocus;
 
     if (!window)
@@ -629,7 +618,6 @@ static void keyboardHandleKey(void* data,
                               uint32_t key,
                               uint32_t state)
 {
-    // printf("[c++][glfw][keyboardHandleKey][%d]serial %d, time %d, key %d, state %d\n", timestamp(), serial, time, key, state);
     int keyCode;
     int action;
     _GLFWwindow* window = _glfw.wl.keyboardFocus;
@@ -674,8 +662,6 @@ static void keyboardHandleModifiers(void* data,
                                     uint32_t modsLocked,
                                     uint32_t group)
 {
-    // printf("[c++][glfw][keyboardHandleModifiers][%d]serial %d, modsDepressed %d, modsLatched %d, modsLocked %d, group %d\n", timestamp(), serial, modsDepressed, modsLatched, modsLocked, group);
-
     xkb_mod_mask_t mask;
     unsigned int modifiers = 0;
 
@@ -781,7 +767,7 @@ static void touchHandleDown(void *data,
 		                    wl_fixed_t sx,
 		                    wl_fixed_t sy)
 {
-    printf("[c++][glfw][touchHandleDown][%d]serial %d, time %d, id %d, sx %d, sy %d,\n", timestamp(), serial, time, id, sx, sy);
+    // printf("[c++][glfw][touchHandleDown][%d]serial %d, time %d, id %d, sx %d, sy %d,\n", timestamp(), serial, time, id, sx, sy);
     // Happens in the case we just destroyed the surface.
     if (!surface)
         return;
@@ -820,6 +806,7 @@ static void touchHandleUp(void *data,
     if (touch) {
         _glfwTouch(window, touch->wl.x, touch->wl.y, GLFW_TOUCH_UP, time, id);
         glfwDestroyTouch(touch);
+        _glfw.wl.touchFocus = NULL;
     }
 }
 
@@ -844,12 +831,25 @@ static void touchHandleFrame(void *data,
 		                     struct wl_touch *wl_touch)
 {
     // printf("[c++][glfw][touchHandleFrame][%d]\n", timestamp());
+    // currently do nothing
 }
 
 static void touchHandleCancel(void *data,
 		                      struct wl_touch *wl_touch)
 {
     // printf("[c++][glfw][touchHandleCancel][%d]\n", timestamp());
+    _GLFWwindow* window = _glfw.wl.touchFocus;
+
+    if (!window)
+        return;
+    _glfw.wl.serial = serial;
+    _GLFWtouch* touch= glfwGetTouch(window, id);
+    if (touch) {
+        _glfwTouch(window, touch->wl.x, touch->wl.y, GLFW_TOUCH_CANCLE, time, id);
+        glfwDestroyTouch(touch);
+        _glfw.wl.touchFocus = NULL;
+    }
+
 }
 
 static void touchHandleShape(void *data,
@@ -884,18 +884,15 @@ static void seatHandleCapabilities(void* data,
                                    enum wl_seat_capability caps)
 {
     print_callstack();
-    printf("[c++][glfw][seatHandleCapabilities][%d]caps %d,\n", timestamp(), caps);
 
     // pointer
     if ((caps & WL_SEAT_CAPABILITY_POINTER) && !_glfw.wl.pointer)
     {
-        printf("[c++][glfw][seatHandleCapabilities][%d]wl_pointer_add_listener\n", timestamp());
         _glfw.wl.pointer = wl_seat_get_pointer(seat);
         wl_pointer_add_listener(_glfw.wl.pointer, &pointerListener, NULL);
     }
     else if (!(caps & WL_SEAT_CAPABILITY_POINTER) && _glfw.wl.pointer)
     {
-        printf("[c++][glfw][seatHandleCapabilities][%d]wl_pointer_destroy\n", timestamp());
         wl_pointer_destroy(_glfw.wl.pointer);
         _glfw.wl.pointer = NULL;
     }
@@ -903,14 +900,11 @@ static void seatHandleCapabilities(void* data,
     // keyboard
     if ((caps & WL_SEAT_CAPABILITY_KEYBOARD) && !_glfw.wl.keyboard)
     {
-        printf("[c++][glfw][seatHandleCapabilities][%d]wl_keyboard_add_listener\n", timestamp());
         _glfw.wl.keyboard = wl_seat_get_keyboard(seat);
         wl_keyboard_add_listener(_glfw.wl.keyboard, &keyboardListener, NULL);
     }
     else if (!(caps & WL_SEAT_CAPABILITY_KEYBOARD) && _glfw.wl.keyboard)
     {
-        printf("[c++][glfw][seatHandleCapabilities][%d]wl_keyboard_destroy\n", timestamp());
-
         wl_keyboard_destroy(_glfw.wl.keyboard);
         _glfw.wl.keyboard = NULL;
     }
@@ -918,12 +912,10 @@ static void seatHandleCapabilities(void* data,
     // touch
     if ( (caps & WL_SEAT_CAPABILITY_TOUCH) && !_glfw.wl.touch ) {
         // 监听 touch
-        printf("[c++][glfw][seatHandleCapabilities][%d]wl_touch_add_listener\n", timestamp());
         _glfw.wl.touch = wl_seat_get_touch(seat);
         wl_touch_add_listener(_glfw.wl.touch, &touchListener, NULL);
     } else if (!(caps & WL_SEAT_CAPABILITY_TOUCH) && _glfw.wl.touch) {
         // 释放监听 touch
-        printf("[c++][glfw][seatHandleCapabilities][%d]wl_touch_destroy\n", timestamp());
         wl_touch_destroy(_glfw.wl.touch);
         _glfw.wl.touch = NULL;
     }
