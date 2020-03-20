@@ -845,7 +845,7 @@ static void touchHandleCancel(void *data,
     // _glfw.wl.serial = serial;
     // _GLFWtouch* touch= glfwGetTouch(window, id);
     // if (touch) {
-    //     _glfwTouch(window, touch->wl.x, touch->wl.y, GLFW_TOUCH_CANCLE, time, id);
+    //     _glfwTouch(window, touch->wl.x, touch->wl.y, GLFW_TOUCH_CANCEL, time, id);
     //     glfwDestroyTouch(touch);
     //     _glfw.wl.touchFocus = NULL;
     // }
