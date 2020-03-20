@@ -838,17 +838,17 @@ static void touchHandleCancel(void *data,
 		                      struct wl_touch *wl_touch)
 {
     // printf("[c++][glfw][touchHandleCancel][%d]\n", timestamp());
-    _GLFWwindow* window = _glfw.wl.touchFocus;
+    // _GLFWwindow* window = _glfw.wl.touchFocus;
 
-    if (!window)
-        return;
-    _glfw.wl.serial = serial;
-    _GLFWtouch* touch= glfwGetTouch(window, id);
-    if (touch) {
-        _glfwTouch(window, touch->wl.x, touch->wl.y, GLFW_TOUCH_CANCLE, time, id);
-        glfwDestroyTouch(touch);
-        _glfw.wl.touchFocus = NULL;
-    }
+    // if (!window)
+    //     return;
+    // _glfw.wl.serial = serial;
+    // _GLFWtouch* touch= glfwGetTouch(window, id);
+    // if (touch) {
+    //     _glfwTouch(window, touch->wl.x, touch->wl.y, GLFW_TOUCH_CANCLE, time, id);
+    //     glfwDestroyTouch(touch);
+    //     _glfw.wl.touchFocus = NULL;
+    // }
 
 }
 
