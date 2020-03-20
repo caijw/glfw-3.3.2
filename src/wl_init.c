@@ -771,7 +771,6 @@ static void touchHandleDown(void *data,
     // Happens in the case we just destroyed the surface.
     if (!surface)
         return;
-
     _GLFWwindow* window = wl_surface_get_user_data(surface);
     if (!window)
     {
@@ -834,22 +833,29 @@ static void touchHandleFrame(void *data,
     // currently do nothing
 }
 
+// Touch cancellation applies to all touch points
+// currently active on this client's surface.
+// https://wayland.freedesktop.org/docs/html/apa.html#protocol-spec-wl_touch
 static void touchHandleCancel(void *data,
 		                      struct wl_touch *wl_touch)
 {
     // printf("[c++][glfw][touchHandleCancel][%d]\n", timestamp());
-    // _GLFWwindow* window = _glfw.wl.touchFocus;
+    _GLFWwindow* window = _glfw.wl.touchFocus;
 
-    // if (!window)
-    //     return;
-    // _glfw.wl.serial = serial;
-    // _GLFWtouch* touch= glfwGetTouch(window, id);
-    // if (touch) {
-    //     _glfwTouch(window, touch->wl.x, touch->wl.y, GLFW_TOUCH_CANCEL, time, id);
-    //     glfwDestroyTouch(touch);
-    //     _glfw.wl.touchFocus = NULL;
-    // }
-
+    if (!window)
+        return;
+    // 现在所有的touch都是存在全局的，没有区分window
+    // TODO 后面看看有没有必要区分哪个 window 对应哪些 touch
+    _GLFWtouch* touch;
+    _GLFWtouch* preTouch;
+    for (touch = _glfw.touchListHead; touch;)
+    {
+        _glfwTouch(window, touch->wl.x, touch->wl.y, GLFW_TOUCH_CANCEL, 0, touch->wl.id);
+        preTouch = touch;
+        touch = touch->next;
+        free(preTouch);
+    }
+    _glfw.wl.touchFocus = NULL;
 }
 
 static void touchHandleShape(void *data,
